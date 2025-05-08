@@ -1,15 +1,24 @@
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import React, {useEffect} from 'react';
-import HomeScreen from './screens/HomeScreen';
-import {Text, View} from 'react-native';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 
+// 스크린
+import HomeScreen from './src/screens/HomeScreen';
+import SalesTargetScreen from './src/screens/SalesTargetScreen';
+import SalesRecordScreen from './src/screens/SalesRecordScreen';
+
+const Drawer = createDrawerNavigator();
+
+// App
 function App(): React.JSX.Element {
-  // 깃허브 커밋 푸쉬 테스트
   return (
-    <View>
-      <Text>여기는 홈이다ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ</Text>
-    </View>
+    <NavigationContainer>
+      <Drawer.Navigator initialRouteName="Home">
+        <Drawer.Screen name="Home" component={HomeScreen} options={{title: '홈'}} />
+        <Drawer.Screen name="SalesTarget" component={SalesTargetScreen} options={{title: '목표 관리'}} />
+        <Drawer.Screen name="SalesRecord" component={SalesRecordScreen} options={{title: '매출 관리'}} />
+      </Drawer.Navigator>
+    </NavigationContainer>
   );
 }
 
