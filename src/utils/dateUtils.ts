@@ -32,10 +32,9 @@ export function getNext12MonthsByWeekWithRange(): string[] {
     if (!seen[key]) seen[key] = 1;
     const weekNumber = seen[key]++;
 
-    const label = `${year}년 ${month + 1}월 ${weekNumber}주차\n`;
-    const range = `(${formatDate(monday)} ~ ${formatDate(sunday)})`;
+    const range = `${formatDate(monday)} ~ ${formatDate(sunday)}`;
 
-    results.push(`${label} ${range}`);
+    results.push(`${range}`);
 
     // 다음 주로 이동
     current.setDate(current.getDate() + 7);
@@ -60,7 +59,12 @@ function getSunday(d: Date): Date {
   sunday.setDate(monday.getDate() + 6);
   return sunday;
 }
-
+function formatDay(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 export function getDateRange(
   type: string,
   value: string,
@@ -83,27 +87,33 @@ export function getDateRange(
       end: endDate.toISOString().split('T')[0],
     };
   } else if (type === '주') {
-    // 예: "2025년 5월 2주차\n (5월 12일 ~ 5월 18일)"
-    const yearMatch = value.match(/^(\d{4})년/);
-    const rangeMatch = value.match(
-      /\((\d{1,2})월\s*(\d{1,2})일\s*~\s*(\d{1,2})월\s*(\d{1,2})일\)/,
+    // 예: "5월 12일 ~ 5월 18일"
+    const match = value.match(
+      /^(\d{1,2})월\s*(\d{1,2})일\s*~\s*(\d{1,2})월\s*(\d{1,2})일$/,
     );
 
-    if (!yearMatch || !rangeMatch) {
+    if (!match) {
       throw new Error('유효하지 않은 주 형식입니다.');
     }
 
-    const year = parseInt(yearMatch[1], 10);
-    const [, startMonth, startDay, endMonth, endDay] = rangeMatch.map(Number);
+    const startMonth = parseInt(match[1], 10) - 1; // 0-indexed
+    const startDay = parseInt(match[2], 10);
+    const endMonth = parseInt(match[3], 10) - 1; // 0-indexed
+    const endDay = parseInt(match[4], 10);
 
-    const format = (date: Date) => date.toISOString().split('T')[0];
+    const currentYear = new Date().getFullYear();
 
-    const startDate = new Date(year, startMonth - 1, startDay);
-    const endDate = new Date(year, endMonth - 1, endDay);
+    // 시작 날짜와 종료 날짜 계산
+    const startDate = new Date(currentYear, startMonth, startDay);
+    const endDate = new Date(currentYear, endMonth, endDay);
+
+    // 주 단위로 계산 (월요일 ~ 일요일)
+    const monday = getMonday(startDate);
+    const sunday = getSunday(endDate);
 
     return {
-      start: format(startDate),
-      end: format(endDate),
+      start: formatDay(monday),
+      end: formatDay(sunday),
     };
   } else {
     throw new Error('type은 "월" 또는 "주"만 가능합니다.');
