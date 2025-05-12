@@ -212,7 +212,7 @@ const SalesRecordRepository = {
     // 주간 합계 매출 조회
     else if (recordPeriodType === 'week') {
       const query = `
-                SSELECT 
+                SELECT 
                     date(sales_date, '-' || ((strftime('%w', sales_date) + 6) % 7) || ' days') || ' ~ ' || 
                     date(sales_date, '+' || (6 - ((strftime('%w', sales_date) + 6) % 7)) || ' days') AS sales_date,
                     SUM(sales_amount) AS sales_amount
