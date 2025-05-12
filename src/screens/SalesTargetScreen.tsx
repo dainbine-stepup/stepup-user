@@ -16,7 +16,6 @@ import {
   removeSalesTarget,
   updateTargetAmount,
 } from '../database/SalesTargetRepository';
-import CheckBox from '@react-native-community/checkbox';
 
 type SalesTarget = {
   sales_target_id: number;
