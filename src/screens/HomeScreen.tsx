@@ -499,7 +499,7 @@ function HomeScreen({navigation}: any) {
       {/* 맞춤 상담 이동 */}
       <View style={styles.row}>
           <Text>맞춤 상담 관리</Text>
-          <TouchableOpacity style={styles.moveButton} onPress={() => navigation.navigate('Advise')}>
+          <TouchableOpacity style={styles.moveButton} onPress={() => navigation.navigate('Advice')}>
             <Text>이동</Text>  
           </TouchableOpacity>
       </View>
