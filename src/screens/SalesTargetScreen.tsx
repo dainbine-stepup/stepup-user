@@ -381,14 +381,13 @@ const styles = StyleSheet.create({
   cell: {
     flex: 1,
     padding: 10,
-    minWidth: 100,
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: '#ccc',
     textAlign: 'center',
   },
   firstCell: {
-    flex: 0.1,
+    flex: 0.5,
     padding: 10,
   },
   headerCell: {
