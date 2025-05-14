@@ -10,11 +10,16 @@ const SalesRecordRepository = {
     // 월 매출 저장
     if (insertPeriodType === 'month') {
       // 입력 받은 날짜 값
-      const [yearStr, monthStr] = insertSalesDate.split('-');
-      const year = parseInt(yearStr); // ex) 2025
-      const month = parseInt(monthStr) - 1; // ex) 05
+      const match = insertSalesDate.match(/^(\d{4})년\s*(\d{1,2})월$/);
+      if (!match) {
+        console.error('날짜 형식이 잘못되었습니다:', insertSalesDate);
+        return;
+      }
 
-      // 해당 월의 시작, 마지막 날 계산
+      const year = parseInt(match[1]); // 2025
+      const month = parseInt(match[2]) - 1; // 4 (JavaScript에서 월은 0부터 시작)
+
+      // 해당 월의 시작일, 마지막일 계산
       const startDate = new Date(year, month, 1);
       const endDate = new Date(year, month + 1, 0);
       const daysInMonth = endDate.getDate();
