@@ -380,7 +380,7 @@ function SalesRecordScreen() {
       <ScrollView>
         {/* 매출 기록 목록 출력 */}
         <View style={styles.tableHeader}>
-          <TouchableOpacity
+          <Text
             onPress={() => {
               if (checkedRecords.length === salesRecords.length) {
                 setCheckedRecords([]);
@@ -390,14 +390,12 @@ function SalesRecordScreen() {
                 );
               }
             }}
-            style={[styles.tableHeaderCell, {flex: 0.1}]}>
-            <Text style={styles.tableCell}>
-              {checkedRecords.length === salesRecords.length ? '✅' : '⬜'}
-            </Text>
-          </TouchableOpacity>
+            style={[styles.tableHeaderCell, styles.firstCell]}>
+            {checkedRecords.length === salesRecords.length ? '✅' : '⬜'}
+          </Text>
 
-          <Text style={[styles.tableHeaderCell, {flex: 1}]}>날짜</Text>
-          <Text style={[styles.tableHeaderCell, {flex: 1}]}>금액</Text>
+          <Text style={styles.tableHeaderCell}>날짜</Text>
+          <Text style={styles.tableHeaderCell}>금액</Text>
         </View>
 
         {salesRecords.map(record => (
@@ -405,7 +403,7 @@ function SalesRecordScreen() {
             key={record.sales_date}
             onPress={() => toggleCheck(record.sales_date)}
             style={styles.tableRow}>
-            <Text style={[styles.tableCell, {flex: 0.1}]}>
+            <Text style={[styles.tableCell, styles.firstCell]}>
               {checkedRecords.includes(record.sales_date) ? '✅' : '⬜'}
             </Text>
 
@@ -413,7 +411,7 @@ function SalesRecordScreen() {
               {record.sales_date}
             </Text>
             <Text style={[styles.tableCell, {flex: 1}]}>
-              {record.sales_amount}원
+              {record.sales_amount.toLocaleString()}원
             </Text>
           </TouchableOpacity>
         ))}
@@ -576,7 +574,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    paddingVertical: 8,
+    padding: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
     backgroundColor: '#f0f0f0',
@@ -586,16 +584,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+
   tableRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    padding: 10,
     borderBottomWidth: 1,
     borderColor: '#eee',
   },
   tableCell: {
     flex: 1,
     textAlign: 'center',
+  },
+  firstCell: {
+    flex: 0.5,
+    textAlign: 'left',
   },
   checkbox: {
     width: 20,
