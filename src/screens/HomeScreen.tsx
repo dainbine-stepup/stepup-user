@@ -5,19 +5,16 @@ import { useFocusEffect } from '@react-navigation/native';
 import { LineChart, BarChart } from 'react-native-gifted-charts';
 
 function HomeScreen({navigation}: any) {
-
+  
   // 날짜 변수
   const [periodType, setPeriodType] = useState<'month' | 'week'>('month');
   const [refreshKey, setRefreshKey] = useState(0); // 차트 새로고침용
-  const [periodList, setPeriodList] = useState<string[]>([]);
-  const [showPeriodList, setShowPeriodList] = useState<boolean>(false);
 
   // 날짜 포맷
   const getCurrentPeriod = (type: 'month' | 'week') => {
     const today = new Date();
     const year = today.getFullYear();
     const month = `${today.getMonth() + 1}`.padStart(2, '0');
-    const date = `${today.getDate()}`.padStart(2, '0');
 
     if (type === 'month') return `${year}-${month}`;
     if (type === 'week') {
@@ -33,16 +30,13 @@ function HomeScreen({navigation}: any) {
   // 사용자가 고른 기간 문자열(기본값: 현재)
   const [selectedPeriod, setSelectedPeriod] = useState(getCurrentPeriod('month')); 
 
-  // 매출 목표, 실적 합계
-  const [salesTarget, setSalesTarget] = useState('');
-  const [totalAmount, setTotalAmount] = useState<number>(0);
+  // 매출 목표 실적 달성율 데이터
+  const [chartData, setChartData] = useState({
+    salesTarget: '0',
+    totalAmount: 0,
+    achievementRate: 0,
+  });
 
-  // 달성율
-  const [achievementRate, setAchievementRate] = useState<number>(0);
-  const [salesTargetReady, setSalesTargetReady] = useState(false);
-  const [totalAmountReady, setTotalAmountReady] = useState(false);
-
-  
   // 그래프에 사용할 월, 주 데이터
   const [monthData, setMonthData] = useState<{ sales_date: string, sales_amount: number }[]>([]);
   const [weekData, setWeekData] = useState<{ sales_date: string, sales_amount: number }[]>([]);
@@ -115,14 +109,31 @@ function HomeScreen({navigation}: any) {
 
   // 기간 타입 변경될 때
   useEffect(() => {
+    console.log('설정 기간 타입 변경')
     // 데이터 초기화
     setMonthData([]);
     setWeekData([]);
     // 그래프 로딩
     setIsLoadingGraph(true);
 
+    // 로컬 변수로 임시 저장
+    let tempTarget: number | null = null;
+    let tempAmount: number | null = null;
+
     const period = getCurrentPeriod(periodType);
-    const fullDates = getDateRange(periodType);
+    const fullDates = getDateRange(periodType, period);
+
+    const tryUpdateChartData = () => {
+      if (tempTarget !== null && tempAmount !== null) {
+        const rate = tempTarget > 0 ? parseFloat(((tempAmount / tempTarget) * 100).toFixed(1)) : 0;
+        setChartData({
+          salesTarget: String(tempTarget),
+          totalAmount: tempAmount,
+          achievementRate: rate,
+        });
+        setIsLoadingGraph(false);
+      }
+    };
 
     // 현재 시간 기준 기간으로 변경
     setSelectedPeriod(period);
@@ -138,51 +149,8 @@ function HomeScreen({navigation}: any) {
         } else if (periodType === 'week') {
           setWeekData(filled);
         }
-        const total = filled.reduce((sum, item) => sum + (item.sales_amount || 0), 0);
-        setTotalAmount(total);
-        setIsLoadingGraph(false);
-      },
-      (error: unknown) => {
-        console.error(error);
-        setIsLoadingGraph(false);
-      },
-    );
-
-    // 매출 목표 조회
-    HomeScreenRepository.getSalesTargetByPeriod(
-      periodType,
-      period,
-      (target: number) => setSalesTarget(String(target)),
-      (error: unknown) => console.error(error)
-    );
-
-  }, [periodType]);
-
-  // 설정 기간 변경 시
-  useEffect(() => {
-    // 데이터 초기화
-    setMonthData([]);
-    setWeekData([]);
-    // 그래프 로딩
-    setIsLoadingGraph(true);
-
-    const period = selectedPeriod;
-    const fullDates = getDateRange(periodType);
-
-    // 일별 매출 조회
-    HomeScreenRepository.getDailySalesByPeriod(
-      periodType,
-      period,
-      (records: { sales_date: string, sales_amount: number }[]) => {
-        const filled = fillMissingDates(fullDates, records);
-        if (periodType === 'month') {
-          setMonthData(filled);
-        } else if (periodType === 'week') {
-          setWeekData(filled);
-        }
-        const total = filled.reduce((sum, item) => sum + (item.sales_amount || 0), 0);
-        setTotalAmount(total);
-        setTotalAmountReady(true);
+        tempAmount = filled.reduce((sum, item) => sum + (item.sales_amount || 0), 0);
+        tryUpdateChartData();
         setIsLoadingGraph(false);
       },
       (error: unknown) => {
@@ -196,29 +164,75 @@ function HomeScreen({navigation}: any) {
       periodType,
       period,
       (target: number) => {
-        setSalesTarget(String(target));
-        setSalesTargetReady(true); // 🔹 준비 완료
+        tempTarget = target;
+        tryUpdateChartData();
+      },
+      (error: unknown) => console.error(error)
+    );
+
+  }, [periodType]);
+
+  // 설정 기간 변경 시
+  useEffect(() => {
+    console.log('설정 기간 변경')
+    // 데이터 초기화
+    setMonthData([]);
+    setWeekData([]);
+    // 그래프 로딩
+    setIsLoadingGraph(true);
+
+    // 로컬 변수로 임시 저장
+    let tempTarget: number | null = null;
+    let tempAmount: number | null = null;
+
+    const period = selectedPeriod;
+    const fullDates = getDateRange(periodType, period);
+
+    const tryUpdateChartData = () => {
+      if (tempTarget !== null && tempAmount !== null) {
+        const rate = tempTarget > 0 ? parseFloat(((tempAmount / tempTarget) * 100).toFixed(1)) : 0;
+        setChartData({
+          salesTarget: String(tempTarget),
+          totalAmount: tempAmount,
+          achievementRate: rate,
+        });
+        setIsLoadingGraph(false);
+      }
+    };
+
+    // 일별 매출 조회
+    HomeScreenRepository.getDailySalesByPeriod(
+      periodType,
+      period,
+      (records: { sales_date: string, sales_amount: number }[]) => {
+        const filled = fillMissingDates(fullDates, records);
+        if (periodType === 'month') {
+          setMonthData(filled);
+        } else if (periodType === 'week') {
+          setWeekData(filled);
+        }
+        tempAmount = filled.reduce((sum, item) => sum + (item.sales_amount || 0), 0);
+        tryUpdateChartData();
+        setIsLoadingGraph(false);
+      },
+      (error: unknown) => {
+        console.error(error);
+        setIsLoadingGraph(false);
+      },
+    );
+
+    // 매출 목표 조회
+    HomeScreenRepository.getSalesTargetByPeriod(
+      periodType,
+      period,
+      (target: number) => {
+        tempTarget = target;
+        tryUpdateChartData();
       },
       (error: unknown) => console.error(error)
     );
 
   }, [selectedPeriod, refreshKey])
-
-  // 달성율 업데이트
-  useEffect(() => {
-    if (!salesTargetReady || !totalAmountReady) return;
-
-    const target = parseFloat(salesTarget) || 0;
-    const amount = totalAmount;
-    const rate = target > 0 ? parseFloat(((amount / target) * 100).toFixed(1)) : 0;
-
-    setAchievementRate(rate);
-
-    // 초기화 (다음에 다시 계산할 수 있도록)
-    setSalesTargetReady(false);
-    setTotalAmountReady(false);
-  }, [salesTargetReady, totalAmountReady]);
-
 
   // 현재 페이지 진입시마다 새로고침
   useFocusEffect(
@@ -228,23 +242,23 @@ function HomeScreen({navigation}: any) {
   );
 
   // 해당 기간 전체 날짜 계산(데이터가 없는 날짜도 계산)
-  const getDateRange = (periodType: 'month' | 'week'): string[] => {
-    const today = new Date();
+  const getDateRange = (periodType: 'month' | 'week', periodValue: string): string[] => {
     const dates: string[] = [];
 
     if (periodType === 'month') {
-      const year = today.getFullYear();
-      const month = today.getMonth();
-      const lastDay = new Date(year, month + 1, 0).getDate();
+      const [year, month] = periodValue.split('-').map(Number);
+      const lastDay = new Date(year, month, 0).getDate(); // 0번째 일은 전 달 마지막 날
 
       for (let d = 1; d <= lastDay; d++) {
-        dates.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+        dates.push(`${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
       }
-    } else {
-      const monday = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+    } else if (periodType === 'week') {
+      const [startStr] = periodValue.split(' ~ ');
+      const startDate = new Date(startStr);
+
       for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
         dates.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
       }
     }
@@ -264,8 +278,6 @@ function HomeScreen({navigation}: any) {
     }));
   };
 
-  
-
   // 그래프 y축 라벨
   const generateYAxisLabels = (
     data: { sales_amount: number }[]
@@ -278,13 +290,7 @@ function HomeScreen({navigation}: any) {
     return Array.from({ length: 11 }, (_, i) =>
       Math.round((i * step) / 1000).toLocaleString()
     );
-  };
-
-  
-
-
-  
-  
+  };  
 
   return (
     <ScrollView style={styles.container}>
@@ -416,19 +422,19 @@ function HomeScreen({navigation}: any) {
       {/* 매출 목표 */}
       <View style={styles.row}>
         <Text>매출 목표</Text>      
-        <Text>{parseInt(salesTarget).toLocaleString()}원</Text>
+        <Text>{parseInt(chartData.salesTarget).toLocaleString()}원</Text>
       </View>
 
       {/* 매출 실적 */}
       <View style={styles.row}>
         <Text>매출 실적</Text>      
-        <Text>{totalAmount.toLocaleString()}원</Text>
+        <Text>{chartData.totalAmount.toLocaleString()}원</Text>
       </View>
 
       {/* 달성율 */}
       <View style={styles.row}>
         <Text>달성율</Text>      
-        <Text>{achievementRate}%</Text>
+        <Text>{chartData.achievementRate.toFixed(1)}%</Text>
       </View>
       
       {/* 그래프 */}
@@ -486,6 +492,14 @@ function HomeScreen({navigation}: any) {
       <View style={styles.row}>
           <Text>매출 실적 관리</Text>
           <TouchableOpacity style={styles.moveButton} onPress={() => navigation.navigate('SalesRecord')}>
+            <Text>이동</Text>  
+          </TouchableOpacity>
+      </View>
+
+      {/* 맞춤 상담 이동 */}
+      <View style={styles.row}>
+          <Text>맞춤 상담 관리</Text>
+          <TouchableOpacity style={styles.moveButton} onPress={() => navigation.navigate('Advise')}>
             <Text>이동</Text>  
           </TouchableOpacity>
       </View>

@@ -6,6 +6,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import HomeScreen from './src/screens/HomeScreen';
 import SalesTargetScreen from './src/screens/SalesTargetScreen';
 import SalesRecordScreen from './src/screens/SalesRecordScreen';
+import AdviseScreen from './src/screens/AdviseScreen';
 
 // 데이터베이스
 import { initDatabase } from './src/database/initDatabase';
@@ -24,6 +25,7 @@ function App(): React.JSX.Element {
         <Drawer.Screen name="Home" component={HomeScreen} options={{title: '홈'}} />
         <Drawer.Screen name="SalesTarget" component={SalesTargetScreen} options={{title: '목표 관리'}} />
         <Drawer.Screen name="SalesRecord" component={SalesRecordScreen} options={{title: '매출 관리'}} />
+        <Drawer.Screen name="Advise" component={AdviseScreen} options={{title: '맞춤 상담'}} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
