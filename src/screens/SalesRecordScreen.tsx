@@ -397,29 +397,24 @@ function SalesRecordScreen() {
           <Text style={styles.tableHeaderCell}>날짜</Text>
           <Text style={styles.tableHeaderCell}>금액</Text>
         </View>
-        {salesRecords.map(record => {
-          const date = new Date(record.sales_date);
-          const formattedDate = `${date.getFullYear()}년 ${
-            date.getMonth() + 1
-          }월`;
 
-          return (
-            <TouchableOpacity
-              key={record.sales_date}
-              onPress={() => toggleCheck(record.sales_date)}
-              style={styles.tableRow}>
-              <Text style={[styles.tableCell, styles.firstCell]}>
-                {checkedRecords.includes(record.sales_date) ? '✅' : '⬜'}
-              </Text>
+        {salesRecords.map(record => (
+          <TouchableOpacity
+            key={record.sales_date}
+            onPress={() => toggleCheck(record.sales_date)}
+            style={styles.tableRow}>
+            <Text style={[styles.tableCell, styles.firstCell]}>
+              {checkedRecords.includes(record.sales_date) ? '✅' : '⬜'}
+            </Text>
 
-              <Text style={[styles.tableCell, {flex: 1}]}>{formattedDate}</Text>
-
-              <Text style={[styles.tableCell, {flex: 1}]}>
-                {record.sales_amount.toLocaleString()}원
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+            <Text style={[styles.tableCell, {flex: 1}]}>
+              {record.sales_date}
+            </Text>
+            <Text style={[styles.tableCell, {flex: 1}]}>
+              {record.sales_amount.toLocaleString()}원
+            </Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
 
       {/* 하단 고정 수정/삭제 버튼 */}

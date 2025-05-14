@@ -154,7 +154,10 @@ function SalesTargetScreen() {
     if (col === '날짜') {
       if (viewMode === '월') {
         const date = new Date(row.start_date);
-        return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+          2,
+          '0',
+        )}`;
       } else {
         return `${row.start_date} ~ ${row.end_date}`;
       }
