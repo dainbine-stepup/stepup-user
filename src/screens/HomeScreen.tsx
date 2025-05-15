@@ -121,7 +121,7 @@ function HomeScreen({navigation}: any) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={{ paddingBottom: 60 }} style={styles.container}>
       
       <View>
         <PeriodSelector
@@ -143,11 +143,15 @@ function HomeScreen({navigation}: any) {
       {/* 그래프 */}
       <View style={styles.graphContainer}>
         {!isGraphReady || barData.length === 0 ? (
-          <Text>차트를 불러오는 중...</Text>
+          <View style={[styles.loadingChart]}>
+            <Text style={styles.loadingText}>차트를 불러오는 중...</Text>
+          </View>
         ) : (
           <>
-            <Text style={{ marginBottom: 3 }}>그래프</Text>
-            <Text style={{ marginBottom: 10, fontSize: 10 }}>(단위: 천원)</Text>
+            <View style={styles.graphTitle}>
+              <Text style={{ fontSize: 16 }}>매출 그래프</Text>
+              <Text style={{ fontSize: 10 }}>(단위: 천원)</Text>
+            </View>
             {selected === '월' ? (
               <BarChart
                 data={barData}
@@ -185,28 +189,28 @@ function HomeScreen({navigation}: any) {
 
       {/* 매출 목표 관리 이동 */}
       <View style={styles.row}>
-          <Text>매출 목표 관리</Text>
+          <Text style={styles.label}>매출 목표 관리</Text>
           <TouchableOpacity style={styles.moveButton} onPress={() => navigation.navigate('SalesTarget')}>
-            <Text>이동</Text>  
+            <Text style={styles.moveButtonText}>이동</Text>  
           </TouchableOpacity>
       </View>
 
       {/* 매출 실적 관리 이동 */}
       <View style={styles.row}>
-          <Text>매출 실적 관리</Text>
+          <Text style={styles.label}>매출 실적 관리</Text>
           <TouchableOpacity style={styles.moveButton} onPress={() => navigation.navigate('SalesRecord')}>
-            <Text>이동</Text>  
+            <Text style={styles.moveButtonText}>이동</Text>  
           </TouchableOpacity>
       </View>
 
       {/* 맞춤 상담 이동 */}
       <View style={styles.row}>
-          <Text>맞춤 상담 관리</Text>
+          <Text style={styles.label}>맞춤 상담 관리</Text>
           <TouchableOpacity style={styles.moveButton} onPress={() => navigation.navigate('Advice')}>
-            <Text>이동</Text>  
+            <Text style={styles.moveButtonText}>이동</Text>  
           </TouchableOpacity>
       </View>
-
+      
     </ScrollView>
   );
 }
@@ -220,59 +224,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 30,
+    marginTop: 15,
+    marginBottom: 15,
   },
-  selectedSelector: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  selectedButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: '#ccc',
-  },
-  selectedButtonActive: {
-    backgroundColor: '#007BFF',
-  },
-  selectedButtonText: {
-
-  },
-  selectedButtonTextActive: {
-    fontWeight: 'bold',
-  },
-  period: {
-
-  },
-  periodList: {
-    flexDirection: 'row',
-    gap: 10,
-    marginVertical: 10,
-  },
-  periodButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#eee',
-    borderRadius: 6,
-  },
-  periodButtonActive: {
-    backgroundColor: '#007BFF',
-  },
-  periodButtonText: {
-    fontSize: 12,
+  label: {
+    fontSize: 16,
     color: '#333',
   },
-  periodButtonTextActive: {
-    color: '#fff',
-    fontWeight: 'bold',
+  loadingChart: {
+    height: 220,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f2f2f2',
+    borderRadius: 8,
+    marginBottom: 20,
   },
-
+  loadingText: {
+    fontSize: 20,
+    color: '#888',
+  },
   graphContainer: {
     flex: 1,
-    marginTop: 10,
-    paddingBottom: 20,
+    marginVertical: 10,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  graphTitle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 10,
   },
   moveButton: {
-    
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  moveButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   
 })
