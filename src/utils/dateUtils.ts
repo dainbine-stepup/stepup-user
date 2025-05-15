@@ -2,7 +2,7 @@ export function getNext12Months(): string[] {
   const now = new Date();
   const result: string[] = [];
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = -6; i <= 6; i++) {
     const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -16,12 +16,18 @@ export function getNext12MonthsByWeekWithRange(): string[] {
   const now = new Date();
   const results: string[] = [];
 
-  let current = getMonday(new Date(now)); // 오늘 포함된 주의 월요일
+  const startDate = new Date(
+    now.getFullYear(),
+    now.getMonth() - 6,
+    now.getDate(),
+  );
   const endDate = new Date(
     now.getFullYear(),
-    now.getMonth() + 12,
+    now.getMonth() + 6,
     now.getDate(),
-  ); // 정확히 12개월 뒤 같은 날짜
+  );
+
+  let current = getMonday(new Date(startDate)); // 시작 날짜 포함된 주의 월요일
 
   while (current <= endDate) {
     const monday = new Date(current);
@@ -39,7 +45,7 @@ export function getNext12MonthsByWeekWithRange(): string[] {
   return results;
 }
 
-function getMonday(d: Date): Date {
+export function getMonday(d: Date): Date {
   const date = new Date(d);
   const day = date.getDay();
   const diff = day === 0 ? -6 : 1 - day; // 일요일(-6), 월요일(0), ...
@@ -47,14 +53,14 @@ function getMonday(d: Date): Date {
   return date;
 }
 
-function getSunday(d: Date): Date {
+export function getSunday(d: Date): Date {
   const monday = getMonday(d);
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
   return sunday;
 }
 
-function formatDateToYYYYMMDD(date: Date): string {
+export function formatDateToYYYYMMDD(date: Date): string {
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const dd = String(date.getDate()).padStart(2, '0');
