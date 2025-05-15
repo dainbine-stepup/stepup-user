@@ -141,12 +141,23 @@ function AdviceScreen() {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>추천 상담기관</Text>
                 {advice.agencies.map((agency, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.agencyButton}
-                    onPress={() => Linking.openURL(agency.url)}>
-                    <Text style={styles.agencyText}>• {agency.name}</Text>
-                  </TouchableOpacity>
+                  <View key={index} style={styles.agencyBox}>
+                    <Text style={styles.agencyName}>• {agency.name}</Text>
+                    {agency.phone && (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                        <Text>문의전화: </Text>
+                        <TouchableOpacity onPress={() => Linking.openURL(`tel:${agency.phone}`)}>
+                          <Text style={styles.agencyPhone}>{agency.phone}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                      <Text>공식사이트: </Text>
+                      <TouchableOpacity onPress={() => Linking.openURL(agency.url)}>
+                        <Text style={styles.agencyUrl}>{agency.url}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 ))}
               </View>
             </>
@@ -177,7 +188,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 6,
+    marginBottom: 10,
     color: '#222',
   },
   paragraph: {
@@ -188,9 +199,24 @@ const styles = StyleSheet.create({
   agencyButton: {
     paddingVertical: 6,
   },
-  agencyText: {
+  agencyBox: {
+    marginBottom: 12,
+    padding: 10,
+  },
+  agencyName: {
     fontSize: 16,
-    color: '#007AFF',
+    fontWeight: '600',
+    flexDirection: 'row',
+  },
+  agencyPhone: {
+    fontSize: 14,
+    color: '#333',
+    marginTop: 4,
+  },
+  agencyUrl: {
+    fontSize: 14,
+    color: 'blue',
+    marginTop: 4,
     textDecorationLine: 'underline',
   },
   row: {
