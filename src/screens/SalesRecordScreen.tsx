@@ -77,7 +77,10 @@ function SalesRecordScreen() {
       weekEnd.setDate(weekStart.getDate() + 6);
 
       const formatDate = (date: Date) => {
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+          2,
+          '0',
+        )}-${String(date.getDate()).padStart(2, '0')}`;
       };
 
       result.push(`${formatDate(weekStart)} ~ ${formatDate(weekEnd)}`);
@@ -85,7 +88,6 @@ function SalesRecordScreen() {
 
     setInsertPeriodList(result);
   };
-
 
   // 매출 저장 처리
   const insertSalesRecord = () => {
@@ -265,10 +267,7 @@ function SalesRecordScreen() {
         </TouchableOpacity>
 
         {/* 기간 선택 모달 (조건 분기) */}
-        <Modal
-          visible={showInsertPeriodList}
-          transparent
-          animationType="fade">
+        <Modal visible={showInsertPeriodList} transparent animationType="fade">
           <TouchableWithoutFeedback
             onPress={() => setShowInsertPeriodList(false)}>
             <View style={styles.modalOverlay}>
@@ -281,36 +280,36 @@ function SalesRecordScreen() {
                           setInsertSalesDate(day.dateString);
                           setShowInsertPeriodList(false);
                         }}
-                          markedDates={{
-                            [insertSalesDate]: {
-                              selected: true,
-                              selectedColor: '#007BFF',
-                            },
-                          }}
-                        />
-                      </>
-                    ) : (
-                      <ScrollView style={styles.scrollView}>
-                        {insertPeriodList.map(item => (
-                          <TouchableOpacity
-                            key={item}
-                            style={styles.dropdownItem}
-                            onPress={() => {
-                              setInsertSalesDate(item);
-                              setShowInsertPeriodList(false);
-                            }}>
-                            <Text
-                              style={[
-                                styles.periodItem,
-                                item === insertSalesDate &&
-                                  styles.selectedOptionText,
-                              ]}>
-                              {item}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    )}
+                        markedDates={{
+                          [insertSalesDate]: {
+                            selected: true,
+                            selectedColor: '#007BFF',
+                          },
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <ScrollView style={styles.scrollView}>
+                      {insertPeriodList.map(item => (
+                        <TouchableOpacity
+                          key={item}
+                          style={styles.dropdownItem}
+                          onPress={() => {
+                            setInsertSalesDate(item);
+                            setShowInsertPeriodList(false);
+                          }}>
+                          <Text
+                            style={[
+                              styles.periodItem,
+                              item === insertSalesDate &&
+                                styles.selectedOptionText,
+                            ]}>
+                            {item}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  )}
 
                   <TouchableOpacity
                     onPress={() => setShowInsertPeriodList(false)}>
@@ -329,7 +328,6 @@ function SalesRecordScreen() {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
-        
       </View>
 
       {/* 매출 금액 입력 */}
@@ -518,7 +516,7 @@ const styles = StyleSheet.create({
     width: 220,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    fontSize: 16,
+    fontSize: 14,
   },
   periodDropdownButton: {
     borderWidth: 1,
@@ -531,7 +529,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   periodDropdownText: {
-    fontSize: 16,
+    fontSize: 14,
   },
   modalOverlay: {
     flex: 1,

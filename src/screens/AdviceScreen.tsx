@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
   getTargetAmountByStartDateAndType,
 } from '../database/SalesTargetRepository';
 import {getSalesAmountSumByPeriod} from '../database/TargetSalesRespository';
+import {useFocusEffect} from '@react-navigation/native';
 const typeCdMap: Record<string, string> = {
   월: 'TYPCD001',
   주: 'TYPCD002',
@@ -84,6 +85,12 @@ function AdviceScreen() {
   useEffect(() => {
     fetchData();
   }, [selectedPeriod]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedPeriod('기간을 선택하세요');
+    }, []),
+  );
   return (
     <ScrollView style={styles.container}>
       {/* 기간 설정 섹션 */}

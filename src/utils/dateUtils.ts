@@ -16,16 +16,11 @@ export function getNext12MonthsByWeekWithRange(): string[] {
   const now = new Date();
   const results: string[] = [];
 
-  const startDate = new Date(
-    now.getFullYear(),
-    now.getMonth() - 6,
-    now.getDate(),
-  );
-  const endDate = new Date(
-    now.getFullYear(),
-    now.getMonth() + 6,
-    now.getDate(),
-  );
+  const startDate = new Date(now);
+  startDate.setDate(now.getDate() - 6 * 7); // 6주 전
+
+  const endDate = new Date(now);
+  endDate.setDate(now.getDate() + 6 * 7); // 6주 후
 
   let current = getMonday(new Date(startDate)); // 시작 날짜 포함된 주의 월요일
 

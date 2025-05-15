@@ -80,7 +80,7 @@ function SalesTargetScreen() {
 
   const saveAmount = async () => {
     if (!dateRange.start || !dateRange.end || !amount) {
-      Alert.alert('기간과 목표 금액을 설정하십시오');
+      Alert.alert('입력 오류', '날짜와 금액을 입력하세요.');
       return;
     }
 
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     width: 220,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    fontSize: 16,
+    fontSize: 14,
   },
   saveButton: {
     backgroundColor: '#007BFF',
