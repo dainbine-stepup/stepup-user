@@ -47,8 +47,8 @@ function SalesRecordScreen() {
     const result: string[] = [];
     const today = new Date();
 
-    for (let i = 0; i < 6; i++) {
-      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    for (let i = -6; i <= 6; i++) {
+      const date = new Date(today.getFullYear(), today.getMonth() + i, 1);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       result.push(`${year}년 ${month}월`);
@@ -65,28 +65,27 @@ function SalesRecordScreen() {
     // 오늘 기준 주 시작(월요일) 계산
     const dayOfWeek = today.getDay(); // 일: 0, 월: 1, ..., 토: 6
     const daysSinceMonday = (dayOfWeek + 6) % 7; // 월요일 = 0
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - daysSinceMonday);
+    const currentMonday = new Date(today);
+    currentMonday.setDate(today.getDate() - daysSinceMonday);
 
-    for (let i = 0; i < 6; i++) {
-      const weekStart = new Date(monday);
-      weekStart.setDate(monday.getDate() - 7 * i);
+    // 앞(-6)부터 뒤(+6)까지 주차 생성 (오름차순)
+    for (let i = -6; i <= 6; i++) {
+      const weekStart = new Date(currentMonday);
+      weekStart.setDate(currentMonday.getDate() + 7 * i);
 
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekStart.getDate() + 6);
 
-      const startStr = `${weekStart.getFullYear()}-${String(
-        weekStart.getMonth() + 1,
-      ).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
-      const endStr = `${weekEnd.getFullYear()}-${String(
-        weekEnd.getMonth() + 1,
-      ).padStart(2, '0')}-${String(weekEnd.getDate()).padStart(2, '0')}`;
+      const formatDate = (date: Date) => {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      };
 
-      result.push(`${startStr} ~ ${endStr}`);
+      result.push(`${formatDate(weekStart)} ~ ${formatDate(weekEnd)}`);
     }
 
     setInsertPeriodList(result);
   };
+
 
   // 매출 저장 처리
   const insertSalesRecord = () => {
@@ -146,6 +145,7 @@ function SalesRecordScreen() {
       setInsertSalesAmount('');
       setInsertSalesDate('');
       getSalesRecords(recordPeriodType);
+      setInsertPeriodType('month');
     }, [recordPeriodType]),
   );
 
@@ -255,32 +255,32 @@ function SalesRecordScreen() {
           ))}
         </View>
 
-        <View style={styles.input}>
-          <TouchableOpacity
-            style={styles.periodDropdownButton}
-            onPress={() => setShowInsertPeriodList(prev => !prev)}>
-            <Text style={styles.periodDropdownText}>
-              {insertSalesDate ? `${insertSalesDate}` : '기간을 선택하세요'}
-            </Text>
-          </TouchableOpacity>
+        {/* 기간 선택 버튼 */}
+        <TouchableOpacity
+          style={styles.periodDropdownButton}
+          onPress={() => setShowInsertPeriodList(prev => !prev)}>
+          <Text style={styles.periodDropdownText}>
+            {insertSalesDate ? `${insertSalesDate}` : '기간을 선택하세요'}
+          </Text>
+        </TouchableOpacity>
 
-          {/* 기간 선택 모달 (조건 분기) */}
-          <Modal
-            visible={showInsertPeriodList}
-            transparent
-            animationType="fade">
-            <TouchableWithoutFeedback
-              onPress={() => setShowInsertPeriodList(false)}>
-              <View style={styles.modalOverlay}>
-                <TouchableWithoutFeedback onPress={() => {}}>
-                  <View style={styles.modalContainer}>
-                    {insertPeriodType === 'day' ? (
-                      <>
-                        <Calendar
-                          onDayPress={day => {
-                            setInsertSalesDate(day.dateString);
-                            setShowInsertPeriodList(false);
-                          }}
+        {/* 기간 선택 모달 (조건 분기) */}
+        <Modal
+          visible={showInsertPeriodList}
+          transparent
+          animationType="fade">
+          <TouchableWithoutFeedback
+            onPress={() => setShowInsertPeriodList(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View style={styles.modalContainer}>
+                  {insertPeriodType === 'day' ? (
+                    <>
+                      <Calendar
+                        onDayPress={day => {
+                          setInsertSalesDate(day.dateString);
+                          setShowInsertPeriodList(false);
+                        }}
                           markedDates={{
                             [insertSalesDate]: {
                               selected: true,
@@ -312,23 +312,24 @@ function SalesRecordScreen() {
                       </ScrollView>
                     )}
 
-                    <TouchableOpacity
-                      onPress={() => setShowInsertPeriodList(false)}>
-                      <Text
-                        style={{
-                          textAlign: 'center',
-                          marginTop: 10,
-                          color: 'red',
-                        }}>
-                        닫기
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </TouchableWithoutFeedback>
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>
-        </View>
+                  <TouchableOpacity
+                    onPress={() => setShowInsertPeriodList(false)}>
+                    <Text
+                      style={{
+                        width: '100%',
+                        textAlign: 'center',
+                        marginTop: 10,
+                        color: 'red',
+                      }}>
+                      닫기
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+        
       </View>
 
       {/* 매출 금액 입력 */}
@@ -506,6 +507,9 @@ const styles = StyleSheet.create({
   periodButtonTextActive: {
     color: '#fff',
   },
+  scrollView: {
+    maxHeight: 200,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -516,7 +520,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
   },
-  periodDropdownButton: {},
+  periodDropdownButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    width: 220,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+  },
   periodDropdownText: {
     fontSize: 16,
   },
@@ -698,9 +711,6 @@ const styles = StyleSheet.create({
   dropdownItem: {
     paddingVertical: 10,
     paddingHorizontal: 15,
-  },
-  scrollView: {
-    maxHeight: 200,
   },
 });
 
