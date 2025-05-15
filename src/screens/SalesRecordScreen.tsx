@@ -290,7 +290,7 @@ function SalesRecordScreen() {
                         />
                       </>
                     ) : (
-                      <ScrollView>
+                      <ScrollView style={styles.scrollView}>
                         {insertPeriodList.map(item => (
                           <TouchableOpacity
                             key={item}
@@ -698,6 +698,9 @@ const styles = StyleSheet.create({
   dropdownItem: {
     paddingVertical: 10,
     paddingHorizontal: 15,
+  },
+  scrollView: {
+    maxHeight: 200,
   },
 });
 
