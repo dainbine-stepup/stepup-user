@@ -148,6 +148,7 @@ function SalesRecordScreen() {
       setInsertSalesDate('');
       getSalesRecords(recordPeriodType);
       setInsertPeriodType('month');
+      setCheckedRecords([]);
     }, [recordPeriodType]),
   );
 
@@ -390,7 +391,10 @@ function SalesRecordScreen() {
               }
             }}
             style={[styles.tableHeaderCell, styles.firstCell]}>
-            {checkedRecords.length === salesRecords.length ? '✅' : '⬜'}
+            {checkedRecords.length === salesRecords.length &&
+            checkedRecords.length > 0
+              ? '✅'
+              : '⬜'}
           </Text>
 
           <Text style={styles.tableHeaderCell}>날짜</Text>

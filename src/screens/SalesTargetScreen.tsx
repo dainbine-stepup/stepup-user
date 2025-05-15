@@ -71,6 +71,7 @@ function SalesTargetScreen() {
       setAmount('');
       setSelectedPeriod('기간을 선택하세요');
       setDateRange({start: '', end: ''});
+      setSelectedIds([]);
     }, []),
   ); // 화면 진입하면 매출금액 초기화
 
