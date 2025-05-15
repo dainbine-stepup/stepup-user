@@ -290,7 +290,7 @@ function SalesRecordScreen() {
                       />
                     </>
                   ) : (
-                    <ScrollView style={styles.scrollArea}>
+                    <ScrollView style={styles.scrollView}>
                       {insertPeriodList.map(item => (
                         <TouchableOpacity
                           key={item}
@@ -507,8 +507,8 @@ const styles = StyleSheet.create({
   periodButtonTextActive: {
     color: '#fff',
   },
-  scrollArea: {
-    maxHeight: 200, // ✅ 스크롤 되는 영역
+  scrollView: {
+    maxHeight: 200,
   },
   input: {
     borderWidth: 1,
