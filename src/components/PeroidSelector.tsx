@@ -176,7 +176,8 @@ const styles = StyleSheet.create({
   },
 
   periodText: {
-    fontSize: 16,
+    fontSize: 14,
+    textAlign: 'center',
     color: '#333',
   },
 
