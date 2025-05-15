@@ -114,3 +114,30 @@ export const updateTargetAmount = (salesTargetId, newAmount) => {
     });
   });
 };
+
+// 시작일 주고 target_amount 반환하는 함수
+export const getTargetAmountByStartDateAndType = (startDate, typeCd) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `SELECT target_amount FROM tb_sales_target 
+         WHERE start_date = ? AND type_cd = ? AND status_cd = 'STTCD001' 
+         LIMIT 1`,
+        [startDate, typeCd],
+        (_, result) => {
+          if (result.rows.length > 0) {
+            const {target_amount} = result.rows.item(0);
+            resolve(target_amount);
+          } else {
+            resolve(null); // 해당 조건에 맞는 데이터 없음
+          }
+        },
+        (_, error) => {
+          console.log('target_amount 조회 실패:', error);
+          reject(error);
+          return false;
+        },
+      );
+    });
+  });
+};
