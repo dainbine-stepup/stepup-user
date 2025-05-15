@@ -281,36 +281,36 @@ function SalesRecordScreen() {
                           setInsertSalesDate(day.dateString);
                           setShowInsertPeriodList(false);
                         }}
-                        markedDates={{
-                          [insertSalesDate]: {
-                            selected: true,
-                            selectedColor: '#007BFF',
-                          },
-                        }}
-                      />
-                    </>
-                  ) : (
-                    <ScrollView style={styles.scrollView}>
-                      {insertPeriodList.map(item => (
-                        <TouchableOpacity
-                          key={item}
-                          style={styles.dropdownItem}
-                          onPress={() => {
-                            setInsertSalesDate(item);
-                            setShowInsertPeriodList(false);
-                          }}>
-                          <Text
-                            style={[
-                              styles.periodItem,
-                              item === insertSalesDate &&
-                                styles.selectedOptionText,
-                            ]}>
-                            {item}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  )}
+                          markedDates={{
+                            [insertSalesDate]: {
+                              selected: true,
+                              selectedColor: '#007BFF',
+                            },
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <ScrollView style={styles.scrollView}>
+                        {insertPeriodList.map(item => (
+                          <TouchableOpacity
+                            key={item}
+                            style={styles.dropdownItem}
+                            onPress={() => {
+                              setInsertSalesDate(item);
+                              setShowInsertPeriodList(false);
+                            }}>
+                            <Text
+                              style={[
+                                styles.periodItem,
+                                item === insertSalesDate &&
+                                  styles.selectedOptionText,
+                              ]}>
+                              {item}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    )}
 
                   <TouchableOpacity
                     onPress={() => setShowInsertPeriodList(false)}>
