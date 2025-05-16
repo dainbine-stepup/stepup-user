@@ -345,8 +345,26 @@ function SalesRecordScreen() {
       </View>
 
       {/* 저장 버튼 */}
-      <TouchableOpacity style={styles.saveButton} onPress={insertSalesRecord}>
-        <Text style={styles.saveButtonText}>추가</Text>
+      <TouchableOpacity
+        style={styles.saveButton}
+        onPress={() => {
+          if (insertPeriodType === 'month' || insertPeriodType === 'week') {
+            Alert.alert(
+              '확인',
+              '선택한 기간에 기존 일 매출이 있으면 입력 금액이 균등 분배되어 덮어쓰기 됩니다. 계속 진행할까요?',
+              [
+                { text: '취소', style: 'cancel' },
+                { text: '확인', onPress: insertSalesRecord },
+              ]
+            );
+          } else {
+            insertSalesRecord();
+          }
+        }}
+      >
+        <Text style={styles.saveButtonText}>
+          {insertPeriodType === 'day' ? '추가' : '일괄 입력'}
+        </Text>
       </TouchableOpacity>
 
       {/* 매출 조회 기간 설정 */}
@@ -425,7 +443,20 @@ function SalesRecordScreen() {
         <View style={styles.actionBar}>
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
-            onPress={handleDelete}>
+            onPress={() => {
+              if (recordPeriodType === 'month' || recordPeriodType === 'week') {
+                Alert.alert(
+                  '확인',
+                  '선택한 기간에 포함된 모든 일매출 데이터가 삭제됩니다. 계속 진행하시겠습니까?',
+                  [
+                    { text: '취소', style: 'cancel' },
+                    { text: '확인', onPress: handleDelete },
+                  ]
+                );
+              } else {
+                handleDelete();
+              }
+            }}>
             <Text style={styles.actionButtonText}>삭제</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={handleUpdate}>
@@ -456,7 +487,32 @@ function SalesRecordScreen() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.button, styles.updateButton]}
-                    onPress={applyUpdateAmount}>
+                    onPress={() => {
+                      if (recordPeriodType === 'month' || recordPeriodType === 'week') {
+                        Alert.alert(
+                          '수정 확인',
+                          '선택한 기간은 금액이 균등 분배되어 저장되고, 선택한 날짜는 입력값으로 일괄 수정됩니다. 계속 진행할까요?',
+                          [
+                            { text: '취소', style: 'cancel' },
+                            { text: '확인', onPress: applyUpdateAmount },
+                          ]
+                        );
+                      } else {
+                        if (checkedRecords.length >= 2) {
+                          Alert.alert(
+                            '수정 확인',
+                            '선택한 날짜는 모두 동일한 금액으로 수정됩니다. 계속 진행하시겠습니까?',
+                            [
+                              { text: '취소', style: 'cancel' },
+                              { text: '확인', onPress: applyUpdateAmount },
+                            ]
+                          );
+                        } else {
+                          applyUpdateAmount();
+                        }
+                      }
+                    }}
+                  >
                     <Text style={styles.actionButtonText}>수정</Text>
                   </TouchableOpacity>
                 </View>

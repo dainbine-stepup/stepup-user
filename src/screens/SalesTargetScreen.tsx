@@ -16,6 +16,7 @@ import {
   insertSalesTarget,
   removeSalesTarget,
   updateTargetAmount,
+  getTargetAmountByStartDateAndType,
 } from '../database/SalesTargetRepository';
 import {useFocusEffect} from '@react-navigation/native';
 
@@ -55,6 +56,30 @@ function SalesTargetScreen() {
   const [updateAmount, setUpdateAmount] = useState('');
 
   const currentData = viewMode === '월' ? monthlyData : weeklyData;
+
+  // 수정일: 2025-05-16
+  // 수정자: 이민웅
+  // 기간 선택했을 때 해당 기간에 목표 금액이 있으면 금액 입력창에 업데이트
+  useEffect(() => {
+    const typeCd = typeCdMap[selected];
+    setAmount(''); // 월,주 버튼 누를때마다 초기화되도록
+
+    // 선택한 기간 target_amount 값 있는지 조회
+    const fetchTargetAmount = async () => {
+      if (!dateRange?.start || !typeCd) return;
+
+      try {
+        const result = await getTargetAmountByStartDateAndType(dateRange.start, typeCd);
+        setAmount(result !== null ? String(result) : ''); // target_amount 값 있으면 매출 금액 입력 창 업데이트
+      } catch (error) {
+        console.error('target_amount 불러오기 실패:', error);
+        setAmount('');
+      }
+    };
+
+    fetchTargetAmount();
+  }, [dateRange, selected])
+  // =============
 
   const fetchData = async () => {
     const data = await getSalesTargetsByType(typeCdMap[viewMode]);
