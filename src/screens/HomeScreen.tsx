@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useMemo, useCallback } from 'react';
 import {ScrollView, View, Text, StyleSheet, TouchableOpacity, Dimensions}  from 'react-native';
-import HomeScreenRepository from '../database/HomeScreenRepository';
 import { useFocusEffect } from '@react-navigation/native';
 import { LineChart, BarChart } from 'react-native-gifted-charts';
 import PeriodSelector from '../components/PeroidSelector'
@@ -32,18 +31,36 @@ function HomeScreen({navigation}: any) {
     fullDates,
   );
 
-  // 그래프 막대 그래프 데이터
-  const barData = useMemo(() => {
+  type BarChartData = {
+    value: number;
+    label: string;
+  };
+
+  // 막대 그래프 데이터, y축 라벨 텍스트
+  const [barData, setBarData] = useState<BarChartData[]>([]);
+  const [yAxisLabelTexts, setYAxisLabelTexts] = useState<string[]>([]);
+
+  // barData 생성
+  useEffect(() => {
     if (selected === '주') {
-      return graphData.map(item => ({
+      const data = graphData.map(item => ({
         value: item.sales_amount,
         label: item.sales_date.slice(-2) + '일',
       }));
+      setBarData(data);
     } else if (selected === '월') {
-      return groupMonthDataByWeek(graphData);
+      const data = groupMonthDataByWeek(graphData);
+      setBarData(data);
+    } else {
+      setBarData([]);
     }
-    return [];
   }, [graphData]);
+
+  // y축 라벨 생성
+  useEffect(() => {
+    const labels = generateYAxisLabels(barData.map(d => ({ sales_amount: d.value })));
+    setYAxisLabelTexts(labels);
+  }, [barData]);
 
   // 현재 페이지 진입시마다 새로고침 (현재 날짜 기준 월 데이터로)
   useFocusEffect(
@@ -165,8 +182,7 @@ function HomeScreen({navigation}: any) {
                 xAxisThickness={0}
                 xAxisLabelTextStyle={{ fontSize: 10 }}
                 yAxisTextStyle={{ fontSize: 10 }}
-                yAxisLabelTexts={generateYAxisLabels(barData.map(d => ({ sales_amount: d.value }))
-                )}
+                yAxisLabelTexts={yAxisLabelTexts}
               />
             ) : (
               <BarChart
@@ -175,12 +191,13 @@ function HomeScreen({navigation}: any) {
                 width={totalWidth}
                 barWidth={barWidth}
                 spacing={spacing}
+                initialSpacing={10}
                 barBorderRadius={4}
                 yAxisThickness={0}
                 xAxisThickness={0}
                 xAxisLabelTextStyle={{ fontSize: 10 }}
-                yAxisTextStyle={{ fontSize: 12 }}
-                yAxisLabelTexts={generateYAxisLabels(graphData)}
+                yAxisTextStyle={{ fontSize: 10 }}
+                yAxisLabelTexts={yAxisLabelTexts}
               />
             )}
           </>
