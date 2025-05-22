@@ -36,6 +36,23 @@ export const initDatabase = () => {
         console.log(error);
       },
     );
+    tx.executeSql(
+      `CREATE TABLE IF NOT EXISTS tb_sales_target_history (
+      sales_target_history_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sales_date TEXT NOT NULL,
+      sales_amount INTEGER NOT NULL,
+      status_cd TEXT NOT NULL,
+      reg_dt TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+      mod_dt TEXT DEFAULT NULL
+    )`,
+      [],
+      () => {
+        console.log('tb_sales_target_history 테이블 생성 완료');
+      },
+      (tx, error) => {
+        console.log(error);
+      },
+    );
 
     // 매출 테이블
     tx.executeSql(
