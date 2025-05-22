@@ -1,9 +1,9 @@
 import React, {useState, useEffect, useMemo, useCallback } from 'react';
 import {ScrollView, View, Text, StyleSheet, TouchableOpacity, Dimensions}  from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { LineChart, BarChart } from 'react-native-gifted-charts';
 import PeriodSelector from '../components/PeroidSelector'
 import ChartData from '../components/ChartData';
+import GraphComponent from '../components/GraphComponent';
 import {
   getCurrentPeriodText,
   getCurrentPeriodDateRange,
@@ -16,11 +16,31 @@ import {
 
 function HomeScreen({navigation}: any) {
 
+  // 현재 디바이스 스크린 가로 길이로 그래프 너비 계산
+  const screenWidth = Dimensions.get('window').width;
+  const totalWidth = screenWidth - 120; // 좌우 패딩 합쳐서 40 기준 
+
+  const dayCount = 31;
+  const labels = Array.from({ length: dayCount }, (_, i) => `${i + 1}일`);
+  const dataPoints = Array.from({ length: dayCount }, () =>
+    Math.floor(Math.random() * 200000) + 50000
+  );
+  const targetPoints = Array.from({ length: dayCount }, () =>
+    Math.floor(Math.random() * 200000) + 100000
+  );
+  const lineDataPoints = dataPoints.map((value, index) => {
+    const target = targetPoints[index];
+    const ratio = target > 0 ? (value / target) * 100 : 0;
+    return Math.min(Math.round(ratio), 100); // 소수점 반올림 + 최대 100 제한
+  });
   // 기간 선택 관련 상태
   const [selected, setSelected] = useState('월');
   const [selectedPeriod, setSelectedPeriod] = useState('');
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [isGraphReady, setIsGraphReady] = useState<boolean>(true);
+  
+  // 그래프 상태
+  const [graphPeriodType, setGraphPeriodType] = useState(selected);
 
   const fullDates = useMemo(() => getDateRange(dateRange.start, dateRange.end), [dateRange]);
   
@@ -75,6 +95,7 @@ function HomeScreen({navigation}: any) {
   // 기간 타입 변경 시
   useEffect(() => {
     setIsGraphReady(false);
+    setGraphPeriodType(selected);
     if (selected === '월') {
       const range = getCurrentPeriodDateRange();
       setDateRange(range);
@@ -108,9 +129,7 @@ function HomeScreen({navigation}: any) {
     setIsGraphReady(!isLoadingData);
   }, [isLoadingData]);
 
-  // 현재 디바이스 스크린 가로 길이로 그래프 너비 계산
-  const screenWidth = Dimensions.get('window').width;
-  const totalWidth = screenWidth - 120; // 좌우 패딩 합쳐서 40 기준
+  
 
   // 막대 수
   const barCount = barData.length; 
@@ -160,46 +179,12 @@ function HomeScreen({navigation}: any) {
       {/* 그래프 */}
       <View style={styles.graphContainer}>
         {!isGraphReady || barData.length === 0 ? (
-          <View style={[styles.loadingChart]}>
+          <View style={[styles.loadingChart, {height: screenWidth * 2 / 3}]}>
             <Text style={styles.loadingText}>차트를 불러오는 중...</Text>
           </View>
         ) : (
           <>
-            <View style={styles.graphTitle}>
-              <Text style={{ fontSize: 16 }}>매출 그래프</Text>
-              <Text style={{ fontSize: 10 }}>(단위: 천원)</Text>
-            </View>
-            {selected === '월' ? (
-              <BarChart
-                data={barData}
-                frontColor={'#007BFF'}
-                width={totalWidth}
-                barWidth={barWidth}
-                spacing={spacing}
-                initialSpacing={10}
-                barBorderRadius={4}
-                yAxisThickness={0}
-                xAxisThickness={0}
-                xAxisLabelTextStyle={{ fontSize: 10 }}
-                yAxisTextStyle={{ fontSize: 10 }}
-                yAxisLabelTexts={yAxisLabelTexts}
-              />
-            ) : (
-              <BarChart
-                data={barData}
-                frontColor={'#007BFF'}
-                width={totalWidth}
-                barWidth={barWidth}
-                spacing={spacing}
-                initialSpacing={10}
-                barBorderRadius={4}
-                yAxisThickness={0}
-                xAxisThickness={0}
-                xAxisLabelTextStyle={{ fontSize: 10 }}
-                yAxisTextStyle={{ fontSize: 10 }}
-                yAxisLabelTexts={yAxisLabelTexts}
-              />
-            )}
+              <GraphComponent labels={labels} dataPoints={dataPoints} targetPoints={targetPoints} lineDataPoints={lineDataPoints} height={screenWidth * 2 / 3}/>
           </>
         )}
       </View>
@@ -249,7 +234,6 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   loadingChart: {
-    height: 220,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f2f2f2',
