@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {adviceData} from '../data/AdviceInfo';
 import PeriodSelector from '../components/PeroidSelector';
@@ -37,11 +38,9 @@ function AdviceScreen() {
   // 달성률 구간 판단 함수
   const getRange = (rate: number): string => {
     console.log('달성율 파악하도록 하겠다.', rate);
-    if (rate <= 30) return 'veryLow';
-    if (rate <= 50) return 'low';
-    if (rate <= 70) return 'mid';
-    if (rate <= 90) return 'high';
-    return 'veryHigh';
+    if (rate < 85) return 'low';
+    if (rate < 100) return 'mid';
+    return 'high';
   };
 
   // 범위 및 상담 데이터
@@ -80,6 +79,46 @@ function AdviceScreen() {
     } else {
       setAchievementRate(0);
     }
+  };
+
+  // 상담사 연결 버튼 클릭시
+  const handleConsulationRequest = () => {
+    // 추후 자동 전송으로 변경 가능성 존재
+    Alert.alert(
+      '상담 요청',
+      '상담 담당자에게 문자메시지를 송신하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: () => {
+            // 문자 내용 구성
+            const message = `
+[맞춤상담 요청]
+
+목표액: ${targetAmount}원
+실적액: ${salesAmount}원
+달성률: ${achievementRate}%
+분석: ${advice.analysis}
+조언: ${advice.advice}
+          `;
+
+            const phoneNumber = '01067116227';
+            const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(
+              message,
+            )}`;
+
+            Linking.openURL(smsUrl).catch(err =>
+              Alert.alert('오류', '문자 앱을 여는 데 실패했습니다.'),
+            );
+          },
+        },
+      ],
+      {cancelable: true},
+    );
   };
 
   useEffect(() => {
@@ -139,40 +178,15 @@ function AdviceScreen() {
                 <Text style={styles.paragraph}>{advice.advice}</Text>
               </View>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>추천 상담기관</Text>
-                {advice.agencies.map((agency, index) => (
-                  <View key={index} style={styles.agencyBox}>
-                    <Text style={styles.agencyName}>• {agency.name}</Text>
-                    {agency.phone && (
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginTop: 4,
-                        }}>
-                        <Text>문의전화: </Text>
-                        <TouchableOpacity
-                          onPress={() =>
-                            Linking.openURL(`tel:${agency.phone}`)
-                          }>
-                          <Text style={styles.agencyPhone}>{agency.phone}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginTop: 4,
-                      }}>
-                      <Text>공식사이트: </Text>
-                      <TouchableOpacity
-                        onPress={() => Linking.openURL(agency.url)}>
-                        <Text style={styles.agencyUrl}>{agency.url}</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ))}
+                <Text style={styles.sectionTitle}>상담</Text>
+                <View style={styles.consulationView}>
+                  <Text style={styles.agencyText}>비투스 상담 담당자</Text>
+                  <TouchableOpacity
+                    style={styles.consulationRequstBtn}
+                    onPress={handleConsulationRequest}>
+                    <Text style={styles.buttonText}>상담 요청</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </>
           ) : null}
@@ -210,28 +224,25 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: '#444',
   },
-  agencyButton: {
-    paddingVertical: 6,
-  },
-  agencyBox: {
-    marginBottom: 12,
-    padding: 10,
-  },
-  agencyName: {
-    fontSize: 16,
-    fontWeight: '600',
+  consulationView: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+
+    alignItems: 'center',
   },
-  agencyPhone: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 4,
+  agencyText: {
+    fontSize: 17,
   },
-  agencyUrl: {
-    fontSize: 14,
-    color: 'blue',
-    marginTop: 4,
-    textDecorationLine: 'underline',
+
+  consulationRequstBtn: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   row: {
     flexDirection: 'row',
