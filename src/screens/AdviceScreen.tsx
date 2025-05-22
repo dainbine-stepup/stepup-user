@@ -11,7 +11,7 @@ import {adviceData} from '../data/AdviceInfo';
 import PeriodSelector from '../components/PeroidSelector';
 import {
   getSalesTargetsByType,
-  getTargetAmountByStartDateAndType,
+  getSalesAmountSumFromHistory,
 } from '../database/SalesTargetRepository';
 import {getSalesAmountSumByPeriod} from '../database/TargetSalesRespository';
 import {useFocusEffect} from '@react-navigation/native';
@@ -58,9 +58,9 @@ function AdviceScreen() {
   const fetchData = async () => {
     console.log('데이터 불러와라');
 
-    const totalTarget = await getTargetAmountByStartDateAndType(
+    const totalTarget = await getSalesAmountSumFromHistory(
       dateRange.start,
-      typeCdMap[selected],
+      dateRange.end,
     );
 
     if (selected === '월') {
@@ -144,16 +144,30 @@ function AdviceScreen() {
                   <View key={index} style={styles.agencyBox}>
                     <Text style={styles.agencyName}>• {agency.name}</Text>
                     {agency.phone && (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginTop: 4,
+                        }}>
                         <Text>문의전화: </Text>
-                        <TouchableOpacity onPress={() => Linking.openURL(`tel:${agency.phone}`)}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            Linking.openURL(`tel:${agency.phone}`)
+                          }>
                           <Text style={styles.agencyPhone}>{agency.phone}</Text>
                         </TouchableOpacity>
                       </View>
                     )}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginTop: 4,
+                      }}>
                       <Text>공식사이트: </Text>
-                      <TouchableOpacity onPress={() => Linking.openURL(agency.url)}>
+                      <TouchableOpacity
+                        onPress={() => Linking.openURL(agency.url)}>
                         <Text style={styles.agencyUrl}>{agency.url}</Text>
                       </TouchableOpacity>
                     </View>

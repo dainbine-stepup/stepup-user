@@ -13,6 +13,7 @@ import {
   getNext12Months,
   getNext12MonthsByWeekWithRange,
 } from '../utils/dateUtils';
+import {Calendar} from 'react-native-calendars';
 
 function PeriodSelector({
   selected,
@@ -30,7 +31,7 @@ function PeriodSelector({
   setSelected: (value: string) => void;
   setSelectedPeriod: (value: string) => void;
 }) {
-  const options = ['월', '주'];
+  const options = ['월', '주', '일'];
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -51,7 +52,7 @@ function PeriodSelector({
 
   return (
     <View style={styles.wrapper}>
-      {/* 월/주 버튼 */}
+      {/* 월/주/일 버튼 */}
       <View style={styles.selectorWrapper}>
         {options.map(label => (
           <TouchableOpacity
@@ -79,47 +80,88 @@ function PeriodSelector({
       </TouchableOpacity>
 
       {/* 모달 구현 */}
-      <Modal
-        visible={isModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setIsModalVisible(false)}>
-        <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modalContainer}>
-                <ScrollView style={styles.scrollArea}>
-                  {(selected === '월' ? months : weeks).map(option => (
-                    <TouchableOpacity
-                      key={option}
-                      style={styles.dropdownItem}
-                      onPress={() => handleSelectModalOption(option)}>
-                      <Text
-                        style={[
-                          styles.optionText,
-                          option === selectedPeriod &&
-                            styles.selectedOptionText,
-                        ]}>
-                        {option}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      marginTop: 10,
-                      color: 'red',
-                    }}>
-                    닫기
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      {selected === '일' ? (
+        <Modal
+          visible={isModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setIsModalVisible(false)}>
+          <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContainer}>
+                  <Calendar
+                    onDayPress={day => {
+                      const {dateString} = day;
+                      setSelectedPeriod(dateString);
+                      onChangeDate({start: dateString, end: dateString});
+                      setIsModalVisible(false);
+                    }}
+                    markedDates={{
+                      [selectedPeriod]: {
+                        selected: true,
+                        selectedColor: '#007BFF',
+                      },
+                    }}
+                  />
+                  <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        marginTop: 10,
+                        color: 'red',
+                      }}>
+                      닫기
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      ) : (
+        <Modal
+          visible={isModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setIsModalVisible(false)}>
+          <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContainer}>
+                  <ScrollView style={styles.scrollArea}>
+                    {(selected === '월' ? months : weeks).map(option => (
+                      <TouchableOpacity
+                        key={option}
+                        style={styles.dropdownItem}
+                        onPress={() => handleSelectModalOption(option)}>
+                        <Text
+                          style={[
+                            styles.optionText,
+                            option === selectedPeriod &&
+                              styles.selectedOptionText,
+                          ]}>
+                          {option}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        marginTop: 10,
+                        color: 'red',
+                      }}>
+                      닫기
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      )}
     </View>
   );
 }

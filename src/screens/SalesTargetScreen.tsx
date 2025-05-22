@@ -14,21 +14,16 @@ import PeroidSelector from '../components/PeroidSelector';
 import {
   getSalesTargetsByType,
   insertSalesTarget,
-  removeSalesTarget,
-  updateTargetAmount,
-  getTargetAmountByStartDateAndType,
+  removeSalesTargetHistoryByPeriod,
+  getAllValidSalesTargets,
+  updateSalesTargetHistoryByPeriod,
+  getSalesAmountSumFromHistory,
 } from '../database/SalesTargetRepository';
 import {useFocusEffect} from '@react-navigation/native';
 
 type SalesTarget = {
-  sales_target_id: number;
-  start_date: string;
-  end_date: string;
-  target_amount: number;
-  type_cd: string;
-  status_cd: string;
-  reg_dt: string;
-  mod_dt: string | null;
+  period: string;
+  total_amount: number;
 };
 
 const columns = ['선택', '날짜', '금액'];
@@ -36,6 +31,7 @@ const columns = ['선택', '날짜', '금액'];
 const typeCdMap: Record<string, string> = {
   월: 'TYPCD001',
   주: 'TYPCD002',
+  일: 'TYPCD003',
 };
 
 const statusCdMap: Record<string, string> = {
@@ -51,7 +47,7 @@ function SalesTargetScreen() {
   const [dateRange, setDateRange] = useState({start: '', end: ''});
   const [amount, setAmount] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState('기간을 선택하세요');
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [updateAmount, setUpdateAmount] = useState('');
 
@@ -62,15 +58,17 @@ function SalesTargetScreen() {
   // 기간 선택했을 때 해당 기간에 목표 금액이 있으면 금액 입력창에 업데이트
   useEffect(() => {
     const typeCd = typeCdMap[selected];
-    setAmount(''); // 월,주 버튼 누를때마다 초기화되도록
 
     // 선택한 기간 target_amount 값 있는지 조회
     const fetchTargetAmount = async () => {
       if (!dateRange?.start || !typeCd) return;
 
       try {
-        const result = await getTargetAmountByStartDateAndType(dateRange.start, typeCd);
-        setAmount(result !== null ? String(result) : ''); // target_amount 값 있으면 매출 금액 입력 창 업데이트
+        const result = await getSalesAmountSumFromHistory(
+          dateRange.start,
+          dateRange.end,
+        );
+        setAmount(result ? String(result) : ''); // target_amount 값 있으면 매출 금액 입력 창 업데이트
       } catch (error) {
         console.error('target_amount 불러오기 실패:', error);
         setAmount('');
@@ -78,17 +76,18 @@ function SalesTargetScreen() {
     };
 
     fetchTargetAmount();
-  }, [dateRange, selected])
+  }, [dateRange, selected]);
   // =============
 
   const fetchData = async () => {
     const data = await getSalesTargetsByType(typeCdMap[viewMode]);
+
     if (viewMode === '월') {
       setMonthlyData(data);
     } else {
       setWeeklyData(data);
     }
-    setSelectedIds([]); // 데이터 변경 시 선택 초기화
+    setSelectedIds([]); // 데이터 변경 시 선택 초기화*/
   };
 
   useFocusEffect(
@@ -105,6 +104,7 @@ function SalesTargetScreen() {
   }, [viewMode]);
 
   const saveAmount = async () => {
+    console.log('추가 하겠습니다');
     if (!dateRange.start || !dateRange.end || !amount) {
       Alert.alert('입력 오류', '날짜와 금액을 입력하세요.');
       return;
@@ -118,7 +118,6 @@ function SalesTargetScreen() {
         dateRange.start,
         dateRange.end,
         Number(amount),
-        typeCd,
         statusCd,
       );
       Alert.alert('저장 완료', '매출 목표가 저장되었습니다');
@@ -128,34 +127,68 @@ function SalesTargetScreen() {
 
       fetchData();
     } catch (error) {
+      Alert.alert('해당 기간에 이미 목표액이 존재합니다.');
       if (error instanceof Error && error.message === 'DUPLICATE') {
-        Alert.alert('해당 기간에 이미 목표액이 존재합니다.');
       }
     }
   };
 
-  const toggleCheckbox = (id: number) => {
+  const toggleCheckbox = (period: string) => {
     setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
+      prev.includes(period)
+        ? prev.filter(x => x !== period)
+        : [...prev, period],
     );
   };
-
   const toggleAll = () => {
-    const allIds = currentData.map(item => item.sales_target_id);
-    if (selectedIds.length === allIds.length) {
-      setSelectedIds([]); // 모두 선택되어 있으면 해제
+    const allPeriods = currentData.map(item => item.period);
+    if (selectedIds.length === allPeriods.length && allPeriods.length > 0) {
+      setSelectedIds([]);
     } else {
-      setSelectedIds(allIds); // 모두 선택
+      setSelectedIds(allPeriods);
     }
   };
 
   const removeData = async () => {
-    selectedIds.forEach(id => removeSalesTarget(id));
-    fetchData();
+    console.log('삭제');
+    console.log(selectedIds);
+
+    if (selectedIds.length === 0) {
+      Alert.alert('삭제 오류', '삭제할 항목을 선택하세요.');
+      return;
+    }
+
+    const typeCd = typeCdMap[viewMode];
+
+    Alert.alert(
+      '삭제 확인',
+      '선택한 항목을 삭제하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          style: 'destructive',
+          onPress: () => {
+            selectedIds.forEach(id =>
+              removeSalesTargetHistoryByPeriod(typeCd, id),
+            );
+            Alert.alert('완료', '선택한 항목이 삭제되었습니다.');
+            fetchData(); // 삭제 후 데이터 다시 조회
+          },
+        },
+      ],
+      {cancelable: true},
+    );
   };
 
   const updateData = async (amount: string) => {
-    selectedIds.forEach(id => updateTargetAmount(id, parseInt(amount, 10)));
+    const typeCd = typeCdMap[viewMode];
+    selectedIds.forEach(id =>
+      updateSalesTargetHistoryByPeriod(typeCd, id, parseInt(amount, 10)),
+    );
     fetchData();
   };
 
@@ -171,26 +204,18 @@ function SalesTargetScreen() {
   const getContent = (col: string, row: SalesTarget, index: number) => {
     if (index === 0) {
       return (
-        <TouchableOpacity onPress={() => toggleCheckbox(row.sales_target_id)}>
-          <Text>{selectedIds.includes(row.sales_target_id) ? '✅' : '⬜'}</Text>
+        <TouchableOpacity onPress={() => toggleCheckbox(row.period)}>
+          <Text>{selectedIds.includes(row.period) ? '✅' : '⬜'}</Text>
         </TouchableOpacity>
       );
     }
 
     if (col === '날짜') {
-      if (viewMode === '월') {
-        const date = new Date(row.start_date);
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-          2,
-          '0',
-        )}`;
-      } else {
-        return `${row.start_date} ~ ${row.end_date}`;
-      }
+      return row.period;
     }
 
     if (col === '금액') {
-      return `${row.target_amount.toLocaleString()}원`;
+      return `${row.total_amount.toLocaleString()}원`;
     }
 
     return '';
@@ -264,6 +289,21 @@ function SalesTargetScreen() {
             주간 내역
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.toggleButton,
+            viewMode === '일' && styles.selectedToggleButton,
+          ]}
+          onPress={() => setViewMode('일')}>
+          <Text
+            style={[
+              styles.toggleButtonText,
+              viewMode === '일' && styles.selectedToggleButtonText,
+            ]}>
+            일간 내역
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView>
@@ -288,9 +328,9 @@ function SalesTargetScreen() {
 
           {currentData.map(row => (
             <TouchableOpacity
-              key={row.sales_target_id}
+              key={row.period}
               style={styles.row}
-              onPress={() => toggleCheckbox(row.sales_target_id)}>
+              onPress={() => toggleCheckbox(row.period)}>
               {columns.map((col, index) => (
                 <Text
                   key={col}
