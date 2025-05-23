@@ -26,8 +26,6 @@ function HomeScreen({navigation}: any) {
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [isGraphReady, setIsGraphReady] = useState<boolean>(true);
 
-  console.log(dateRange)
-
   const { salesOverviewData } = useSalesOverviewData(
     selected,
     dateRange,
@@ -38,6 +36,10 @@ function HomeScreen({navigation}: any) {
     selected,
     dateRange,
   )
+
+  const isEmptyGraphData = (
+    graphData.dataPoints.every(v => v === 0) && graphData.targetPoints.every(v => v === 0)
+  );
 
   // 현재 페이지 진입시마다 새로고침 (현재 날짜 기준 월 데이터로)
   useFocusEffect(
@@ -127,20 +129,23 @@ function HomeScreen({navigation}: any) {
         </View>
 
         {!isGraphReady ? (
-          <View style={[styles.loadingChart, {height: screenWidth * 2 / 3}]}>
+          <View style={[styles.loadingChart, { height: screenWidth * 2 / 3 }]}>
             <Text style={styles.loadingText}>차트를 불러오는 중...</Text>
           </View>
+        ) : isEmptyGraphData ? (
+          <View style={[styles.loadingChart, { height: screenWidth * 2 / 3 }]}>
+            <Text style={[styles.loadingText, { color: '#666', fontWeight: 'bold'}]}>데이터가 없습니다</Text>
+          </View>
         ) : (
-          <>
-              <GraphComponent 
-                labels={graphData.labels} 
-                dataPoints={graphData.dataPoints}
-                targetPoints={graphData.targetPoints}
-                lineDataPoints={graphData.lineDataPoints}
-                height={screenWidth * 2 / 3}
-              />
-          </>
+          <GraphComponent
+            labels={graphData.labels}
+            dataPoints={graphData.dataPoints}
+            targetPoints={graphData.targetPoints}
+            lineDataPoints={graphData.lineDataPoints}
+            height={screenWidth * 2 / 3}
+          />
         )}
+
       </View>
 
       {/* 매출 목표 관리 이동 */}

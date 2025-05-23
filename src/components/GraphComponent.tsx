@@ -19,6 +19,11 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
     height = 200,
     padding = 40,
 }) => {
+
+    const formatNumber = (num: number): string => {
+        return (num / 1000).toLocaleString('ko-KR'); // 예: 1,000
+    };
+
     const maxBarValue = Math.max(...dataPoints, ...targetPoints);
     const safeMaxBarValue = maxBarValue === 0 ? 1 : maxBarValue;
 
@@ -34,6 +39,9 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
 
     return (
         <View style={styles.wrapper}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 5 }}>
+                <Text style={{ fontSize: 10, color: '#888' }}>(단위: 천원)</Text>
+            </View>
 
             <View style={{ flexDirection: 'row' }}>
                 {/* 왼쪽 고정 y축 */}
@@ -49,7 +57,7 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
                             fill="#333"
                             textAnchor="end"
                         >
-                            {tick}
+                            {formatNumber(tick)}
                         </SvgText>
                         );
                     })}
