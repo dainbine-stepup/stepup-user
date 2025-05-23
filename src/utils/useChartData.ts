@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import HomeScreenRepository from '../database/HomeScreenRepository';
 
 export interface SalesRecord {
@@ -6,35 +6,40 @@ export interface SalesRecord {
   sales_amount: number;
 }
 
-export interface ChartData {
+export interface SalesOverviewData {
   salesTarget: string;
   totalAmount: number;
   achievementRate: number;
 }
 
-export const useChartData = (
+export interface GraphData {
+  labels: string[],
+  dataPoints: number[],
+  targetPoints: number[];
+  lineDataPoints?: number[];
+}
+
+export const useSalesOverviewData = (
   selected: string,
   dateRange: { start: string; end: string },
   selectedPeriod: string,
-  fullDates: string[],
 ) => {
-  const [chartData, setChartData] = useState<ChartData>({
+  const [salesOverviewData, setSalesOverviewData] = useState<SalesOverviewData>({
     salesTarget: '0',
     totalAmount: 0,
     achievementRate: 0,
   });
 
-  const [graphData, setGraphData] = useState<SalesRecord[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+  
 
   useEffect(() => {
     if (selectedPeriod === '기간을 선택하세요') return;
 
-    setIsLoadingData(true);
-    setGraphData([]);
 
     const startDate = dateRange.start;
     const endDate = dateRange.end;
+
+    const fullDates = getDateRange(startDate, endDate);
     
     let tempTarget: number | null = null;
     let tempAmount: number | null = null;
@@ -42,12 +47,11 @@ export const useChartData = (
     const tryUpdateChartData = () => {
       if (tempTarget !== null && tempAmount !== null) {
         const rate = tempTarget > 0 ? parseFloat(((tempAmount / tempTarget) * 100).toFixed(1)) : 0;
-        setChartData({
+        setSalesOverviewData({
           salesTarget: String(tempTarget),
           totalAmount: tempAmount,
           achievementRate: rate,
-        });
-        setIsLoadingData(false);
+        });        
       }
     };
 
@@ -57,13 +61,11 @@ export const useChartData = (
       endDate,
       (records: SalesRecord[]) => {
         const filled = fillMissingDates(fullDates, records);
-        setGraphData(filled);
         tempAmount = filled.reduce((sum, item) => sum + (item.sales_amount || 0), 0);
         tryUpdateChartData();
       },
       (error: unknown) => {
         console.error('매출 실적 조회 오류:', error);
-        setIsLoadingData(false);
       }
     );
 
@@ -79,10 +81,164 @@ export const useChartData = (
         console.error('매출 목표 조회 오류:', error);
       }
     );
-  }, [selected, selectedPeriod, dateRange, fullDates]);
+  }, [dateRange]);
 
-  return { chartData, graphData, isLoadingData };
+  return { salesOverviewData };
 };
+
+// 그래프 데이터
+export const useGraphData = (
+  seleted: string,
+  dateRange: {start: string, end: string},
+) => {
+  const [graphData, setGraphData] = useState<GraphData>({
+    labels: [],
+    dataPoints: [],
+    targetPoints: [],
+    lineDataPoints: [],
+  });
+
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+
+  // 임시 데이터 저장
+  const tempTargetRef = useRef<number[] | null>(null);
+  const tempRecordRef = useRef<number[] | null>(null);
+
+  useEffect(() => {
+
+    setIsLoadingData(true);
+    
+    let { start, end } = dateRange;
+
+    const isValidDate = (dateStr: string) =>
+    /^\d{4}-\d{2}-\d{2}$/.test(dateStr) && !isNaN(new Date(dateStr).getTime());
+
+    // 날짜가 유효하지 않으면 처리하지 않음
+    if (!isValidDate(start) || !isValidDate(end)) {
+      console.warn('잘못된 날짜 형식:', start, end);
+      return;
+    }
+
+    // selected가 '일'이면 최근 7일로 start 날짜 재설정
+    if (seleted === '일') {
+      const endDate = new Date(end);
+      const startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - 6); // 7일 전
+
+      start = startDate.toISOString().slice(0, 10); // 'YYYY-MM-DD' 포맷
+      end = endDate.toISOString().slice(0, 10);
+      console.log(start, end)
+    }
+
+    // 날짜 범위 생성
+    const fullDates = getDateListFromRange(start, end); // ['2025-05-01', ...]
+    const labels = fullDates.map(date => `${new Date(date).getDate()}일`);
+    setGraphData(prev => ({ ...prev, labels }));
+
+    
+    // 매출 목표, 매출 실적 데이터 준비 되면 달성율 계산
+    // => 달성율 계산 끝나면 그래프 데이터 업데이트
+    const tryUpdateGraph = () => {
+
+      const tempTarget = tempTargetRef.current;
+      const tempRecord = tempRecordRef.current;
+      
+        // null 또는 비어 있는 배열일 경우 무시
+        if (
+          tempTarget &&
+          tempRecord &&
+          tempTarget.length > 0 &&
+          tempRecord.length > 0 &&
+          tempTarget.length === tempRecord.length
+        ) {
+          // 날짜별 달성률 계산
+          const lineDataPoints = tempRecord.map((value, index) => {
+            const target = tempTarget[index];
+            return target > 0 ? Math.round((value / target) * 100) : 0;
+          });
+
+          setGraphData(prev => ({
+            ...prev,
+            targetPoints: tempTarget!,
+            dataPoints: tempRecord!,
+            lineDataPoints,
+          }));
+          
+          setIsLoadingData(false);
+
+        } else {
+          // 데이터가 아예 없을 경우 빈 값으로 초기화
+          setGraphData(prev => ({
+            ...prev,
+            targetPoints: tempTarget ?? [],
+            dataPoints: tempRecord ?? [],
+            lineDataPoints: [],
+          }));
+        }
+    };
+
+
+    // 목표 조회
+    HomeScreenRepository.getTargetByPerioid(
+      start,
+      end,
+      (targetList: number[], targetDates: string[]) => {
+        const paddedTarget = mapDataToFullDateRange(fullDates, targetDates, targetList);
+        tempTargetRef.current = paddedTarget;
+        tryUpdateGraph();
+      },
+      (error: any) => {
+        console.error('목표 조회 오류:', error);
+      }
+    );
+
+    // 실적 조회
+    HomeScreenRepository.getRecordByPeriod(
+      start,
+      end,
+      (recordList: number[], recordDates: string[]) => {
+        const paddedRecord = mapDataToFullDateRange(fullDates, recordDates, recordList);
+        tempRecordRef.current = paddedRecord;
+        tryUpdateGraph();
+      },
+      (error: any) => {
+        console.error('실적 조회 오류:', error);
+      }
+    );    
+    
+  }, [dateRange])
+
+  return { graphData, isLoadingData };
+}
+
+export const getDateListFromRange = (start: string, end: string): string[] => {
+  const result: string[] = [];
+  const current = new Date(start);
+  const last = new Date(end);
+
+  while (current <= last) {
+    const yyyy = current.getFullYear();
+    const mm = String(current.getMonth() + 1).padStart(2, '0');
+    const dd = String(current.getDate()).padStart(2, '0');
+    result.push(`${yyyy}-${mm}-${dd}`);
+    current.setDate(current.getDate() + 1);
+  }
+
+  return result;
+};
+
+export const mapDataToFullDateRange = (
+  fullDates: string[],
+  dataDates: string[],
+  dataValues: number[]
+): number[] => {
+  return fullDates.map(date => {
+    const idx = dataDates.indexOf(date);
+    return idx !== -1 ? dataValues[idx] : 0;
+  });
+};
+
+
 
 export const getCurrentPeriodText = (): string => {
   const today = new Date();

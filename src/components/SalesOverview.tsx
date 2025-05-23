@@ -7,7 +7,7 @@ type Props = {
   achievementRate: number;
 };
 
-function ChartData({ salesTarget, totalAmount, achievementRate }: Props) {
+function SalesOverview({ salesTarget, totalAmount, achievementRate }: Props) {
   return (
     <>
       <View style={styles.row}>
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChartData;
+export default SalesOverview;
