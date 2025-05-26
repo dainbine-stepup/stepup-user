@@ -129,11 +129,11 @@ function HomeScreen({navigation}: any) {
         </View>
 
         {!isGraphReady ? (
-          <View style={[styles.loadingChart, { height: screenWidth * 2 / 3 }]}>
+          <View style={[styles.loadingChart, { height: screenWidth * 3 / 4 }]}>
             <Text style={styles.loadingText}>차트를 불러오는 중...</Text>
           </View>
         ) : isEmptyGraphData ? (
-          <View style={[styles.loadingChart, { height: screenWidth * 2 / 3 }]}>
+          <View style={[styles.loadingChart, { height: screenWidth * 3 / 4 }]}>
             <Text style={[styles.loadingText, { color: '#666', fontWeight: 'bold'}]}>데이터가 없습니다</Text>
           </View>
         ) : (
@@ -142,7 +142,7 @@ function HomeScreen({navigation}: any) {
             dataPoints={graphData.dataPoints}
             targetPoints={graphData.targetPoints}
             lineDataPoints={graphData.lineDataPoints}
-            height={screenWidth * 2 / 3}
+            height={screenWidth * 3 / 4 }
           />
         )}
 

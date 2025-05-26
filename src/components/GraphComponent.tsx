@@ -17,15 +17,20 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
     targetPoints = [], // 목표
     lineDataPoints = [], // 달성율
     height = 200,
-    padding = 40,
+    padding = 30,
 }) => {
-
-    const formatNumber = (num: number): string => {
-        return (num / 1000).toLocaleString('ko-KR'); // 예: 1,000
-    };
 
     const maxBarValue = Math.max(...dataPoints, ...targetPoints);
     const safeMaxBarValue = maxBarValue === 0 ? 1 : maxBarValue;
+
+    const formatNumber = (num: number): string => {
+        if (safeMaxBarValue > 1000000) {
+            return Math.floor(num / 1000).toLocaleString('ko-KR'); // 예: 1,000
+        } else {
+            return (num).toLocaleString('ko-KR'); // 예: 1,000
+        }
+        
+    };
 
     const barGroupWidth = 35;
     const barSpacing = 8;
@@ -33,14 +38,26 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
     const chartHeight = height - padding * 2;
 
     const yStepCount = 10;
-    const yStepValue = Math.ceil(maxBarValue / yStepCount / 1000) * 1000;
+    const yStepValue = Math.ceil(maxBarValue / yStepCount);
     const yTicks = Array.from({ length: yStepCount + 1 }, (_, i) => i * yStepValue).reverse();
     const rightYTicks = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0]; // 고정 달성률 눈금
 
     return (
         <View style={styles.wrapper}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 5 }}>
-                <Text style={{ fontSize: 10, color: '#888' }}>(단위: 천원)</Text>
+            <View 
+                style={{ 
+                    flexDirection: 'row', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    paddingHorizontal: 5,
+                }}
+            >
+                <Text style={{ fontSize: 10, color: '#888' }}>
+                    {safeMaxBarValue > 1000000 ? '(단위: 천원)' : '(단위: 원)'}
+                </Text>
+                <Text style={{ fontSize: 10, color: '#888' }}>
+                    (달성율: %)
+                </Text>
             </View>
 
             <View style={{ flexDirection: 'row' }}>
@@ -212,12 +229,6 @@ wrapper: {
     backgroundColor: '#FFF',
     borderRadius: 10,
     padding: 5,
-},
-title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingHorizontal: 10,
-    marginBottom: 10,
 },
 legendContainer: {
     flexDirection: 'row',

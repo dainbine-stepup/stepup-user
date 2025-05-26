@@ -150,7 +150,8 @@ export const useGraphData = (
           // 날짜별 달성률 계산
           const lineDataPoints = tempRecord.map((value, index) => {
             const target = tempTarget[index];
-            return target > 0 ? Math.round((value / target) * 100) : 0;
+            const percent = target > 0 ? Math.round((value / target) * 100) : 0;
+            return Math.min(percent, 100);
           });
 
           setGraphData(prev => ({
