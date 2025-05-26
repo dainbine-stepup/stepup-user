@@ -64,9 +64,9 @@ function HomeScreen({navigation}: any) {
       setSelectedPeriod(getCurrentWeekPeriodText());
     } else if (selected === '일') {
       const today = new Date();
-      const todayStr = today.toISOString().slice(0, 10); // YYYY-MM-DD
+      const todayStr = today.toISOString().slice(0, 10);
       setDateRange({ start: todayStr, end: todayStr });
-      setSelectedPeriod(todayStr.replace(/-/g, '-')); // 예: 2025.05.23
+      setSelectedPeriod(todayStr.replace(/-/g, '-'));
     }
   }, [selected])
 
