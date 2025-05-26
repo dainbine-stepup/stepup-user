@@ -7,6 +7,7 @@ interface GraphComponentProps {
     dataPoints?: number[];
     targetPoints?: number[];
     lineDataPoints?: number[];
+    width?: number;
     height?: number;
     padding?: number;
 }
@@ -16,6 +17,7 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
     dataPoints = [], // 실적
     targetPoints = [], // 목표
     lineDataPoints = [], // 달성율
+    width = 300,
     height = 200,
     padding = 30,
 }) => {
@@ -32,9 +34,13 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
         
     };
 
-    const barGroupWidth = 35;
-    const barSpacing = 8;
-    const chartWidth = labels.length * barGroupWidth;
+    const groupCount = labels.length;
+    const totalAvailableWidth = width - padding * 2; // 왼쪽/오른쪽 y축 제외
+
+    const barGroupWidth = labels.length >= 10 ? (totalAvailableWidth / groupCount * 3) : (totalAvailableWidth / groupCount * 0.9);
+    const barSpacing = labels.length >= 10 ? (barGroupWidth * 0.2) : (barGroupWidth * 0.15);
+
+    const chartWidth = (labels.length * barGroupWidth) + padding / 2;
     const chartHeight = height - padding * 2;
 
     const yStepCount = 10;
@@ -82,7 +88,7 @@ const GraphComponent: React.FC<GraphComponentProps> = ({
 
                 {/* 중앙 스크롤 가능한 그래프 영역 */}
                 <ScrollView horizontal>
-                    <Svg width={chartWidth + padding / 2} height={height}>
+                    <Svg width={chartWidth} height={height}>
                         {/* 보조선 */}
                         {yTicks.map((tick, index) => {
                             const y = padding + ((safeMaxBarValue - tick) / safeMaxBarValue) * chartHeight;

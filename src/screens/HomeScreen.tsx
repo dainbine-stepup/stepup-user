@@ -20,6 +20,8 @@ function HomeScreen({navigation}: any) {
   // 현재 디바이스 스크린 가로 길이
   const screenWidth = Dimensions.get('window').width;
 
+  console.log(screenWidth)
+
   // 기간 선택 관련 상태
   const [selected, setSelected] = useState('월');
   const [selectedPeriod, setSelectedPeriod] = useState('');
@@ -142,6 +144,7 @@ function HomeScreen({navigation}: any) {
             dataPoints={graphData.dataPoints}
             targetPoints={graphData.targetPoints}
             lineDataPoints={graphData.lineDataPoints}
+            width={screenWidth}
             height={screenWidth * 3 / 4 }
           />
         )}
