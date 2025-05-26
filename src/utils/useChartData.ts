@@ -30,8 +30,6 @@ export const useSalesOverviewData = (
     achievementRate: 0,
   });
 
-  
-
   useEffect(() => {
     if (selectedPeriod === '기간을 선택하세요') return;
 
@@ -114,8 +112,7 @@ export const useGraphData = (
     /^\d{4}-\d{2}-\d{2}$/.test(dateStr) && !isNaN(new Date(dateStr).getTime());
 
     // 날짜가 유효하지 않으면 처리하지 않음
-    if (!isValidDate(start) || !isValidDate(end)) {
-      console.warn('잘못된 날짜 형식:', start, end);
+    if (!isValidDate(start) || !isValidDate(end)) {      
       return;
     }
 
@@ -127,7 +124,6 @@ export const useGraphData = (
 
       start = startDate.toISOString().slice(0, 10); // 'YYYY-MM-DD' 포맷
       end = endDate.toISOString().slice(0, 10);
-      console.log(start, end)
     }
 
     // 날짜 범위 생성
