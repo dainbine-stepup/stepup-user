@@ -4,10 +4,10 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import {Image, TouchableOpacity, View, Text} from 'react-native';
 
 // 스크린
-import HomeScreen from './src/screens/HomeScreen';
-import SalesTargetScreen from './src/screens/SalesTargetScreen';
-import SalesRecordScreen from './src/screens/SalesRecordScreen';
+import MainScreen from './src/screens/MainScreen';
+import SalesScreen from './src/screens/SalesScreen';
 import AdviceScreen from './src/screens/AdviceScreen';
+import MyPageScreen from './src/screens/MyPageScreen';
 
 // 컴포넌트
 import CustomDrawerContent from './src/components/CustomDrawerContent'; // 드로어 컨텐츠
@@ -27,14 +27,14 @@ function App(): React.JSX.Element {
   return (
     <NavigationContainer>
       <Drawer.Navigator
-        initialRouteName="Home"
+        initialRouteName="Main"
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={({route}) => {
           const titles: {[key: string]: string} = {
-            Home: 'StepUp',
-            SalesTarget: '목표 관리',
-            SalesRecord: '매출 관리',
+            Main: 'StepUp',
+            Sales: '매출 관리',
             Advice: '맞춤 상담',
+            MyPage: '마이페이지',
           };
 
           return {
@@ -53,10 +53,10 @@ function App(): React.JSX.Element {
           };
         }}
       >
-        <Drawer.Screen name="Home" component={HomeScreen} options={{title: '홈'}} />
-        <Drawer.Screen name="SalesTarget" component={SalesTargetScreen} options={{title: '목표 관리'}} />
-        <Drawer.Screen name="SalesRecord" component={SalesRecordScreen} options={{title: '매출 관리'}} />
-        <Drawer.Screen name="Advice" component={AdviceScreen} options={{title: '맞춤 상담'}} />
+        <Drawer.Screen name="Main" component={MainScreen} options={{title: '메인'}} />
+        <Drawer.Screen name="Sales" component={SalesScreen} options={{title: '매출 관리'}} />
+        {/* <Drawer.Screen name="Advice" component={AdviceScreen} options={{title: '맞춤 상담'}} /> */}
+        <Drawer.Screen name="MyPage" component={MyPageScreen} options={{title: '마이페이지'}} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
