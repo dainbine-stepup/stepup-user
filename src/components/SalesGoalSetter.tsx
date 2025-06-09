@@ -147,7 +147,7 @@ function SalesGoalSetter({ onSave, reset, initialYear, initialMonth }: SalesGoal
                         keyboardType="numeric"
                         style={styles.input}
                     />
-                    <Text>만원</Text>
+                    <Text>원</Text>
                 </View>
 
                 {/* 달성 금액 입력창 */}
@@ -159,7 +159,7 @@ function SalesGoalSetter({ onSave, reset, initialYear, initialMonth }: SalesGoal
                         keyboardType="numeric"
                         style={styles.input}
                     />
-                    <Text>만원</Text>
+                    <Text>원</Text>
                 </View>
                 
                 {/* 적용하기 버튼 */}

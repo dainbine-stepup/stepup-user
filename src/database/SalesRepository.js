@@ -25,6 +25,30 @@ export const getAllSales = () => {
   });
 };
 
+// 특정 년도의 데이터 조회(+달성률 계산)
+export const findSalesByYear = (year) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `SELECT * FROM tb_sales WHERE date LIKE ? ORDER BY date DESC`,
+        [`${year}-%`],
+        (tx, results) => {
+          const rows = results.rows;
+          let data = [];
+          for (let i = 0; i < rows.length; i++) {
+            const item = rows.item(i);
+            const rate = item.target > 0 ? Math.round((item.amount / item.target) * 100) : 0;
+            data.push({...item, rate}); // 달성률 추가
+          }
+          resolve(data);
+        },
+        error => reject(error)
+      );
+    });
+  });
+};
+
+
 // 해당 날짜 데이터 조회
 export const findSalesByDate = (date) => {
   return new Promise((resolve, reject) => {
