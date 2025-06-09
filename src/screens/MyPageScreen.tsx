@@ -1,19 +1,69 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { useFocusEffect } from "@react-navigation/native";
+
+// 컴포넌트
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import SalesOverview from '../components/SalesOverview';
+import SalesPerformance from '../components/SalesPerformance';
 
 function MyPageScreen() {
+
+    // 변수
+    // 현재 년/월 저장
+    const [year, setYear] = useState("");
+    const [month, setMonth] = useState("");
+
+    // 포커스될 때 현재 날짜로 초기화
+    const [componentKey, setComponentKey] = useState(0);
+    useFocusEffect(
+        React.useCallback(() => {
+            // 현재 시간 계산
+            const now = new Date();
+            const currentYear = String(now.getFullYear());
+            const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
+            
+            setYear(currentYear);
+            setMonth(currentMonth);
+
+            setComponentKey(prev => prev + 1);
+
+        }, [])
+    );
+
     return (
-        <View style={styles.container}>
-            <Text>마이페이지</Text>
-        </View>
+        <ScrollView style={styles.container}>
+            <View style={styles.content}>
+                <Header />
+
+                <SalesOverview
+                    key={`salesoverview-${componentKey}`}
+                    initialYear={year}
+                    initialMonth={month}
+                />
+
+                <SalesPerformance
+                    key={`salesperformance-${componentKey}`}
+                    initialYear={year}
+                    initialMonth={month}
+                />
+
+                <Footer />
+            </View>
+        </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
+        padding: 10,
         flex: 1,
-    }
+    },
+    content: {
+        gap: 20,
+        flexDirection: "column",
+    },
 })
 
 export default MyPageScreen;

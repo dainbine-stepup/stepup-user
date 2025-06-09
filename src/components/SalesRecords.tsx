@@ -44,7 +44,7 @@ function SalesRecords({ refresh, initialYear }: SalesRecordsProps) {
                     style={styles.dateButton}
                     onPress={() => setYearModalVisible(true)}
                 >
-                    <Text>{year}</Text>
+                    <Text style={styles.dateButtonText}>{year}</Text>
                 </TouchableOpacity>
 
                 <YearSelectorModal
@@ -73,9 +73,13 @@ function SalesRecords({ refresh, initialYear }: SalesRecordsProps) {
                 </View>
                 <View style={styles.recordBody}>
                     {isLoading ? (
-                        <Text>로딩 중...</Text>
+                        <View style={styles.messageBox}>
+                            <Text style={styles.messageText}>로딩 중...</Text>
+                        </View>
                     ) : salesData.length === 0 ? (
-                        <Text style={styles.emptyText}>매출 데이터가 없습니다.</Text>
+                        <View style={styles.messageBox}>
+                            <Text style={styles.messageText}>매출 데이터가 없습니다.</Text>
+                        </View>
                     ) : (
                         <>
                             {salesData.map((item, index) => (
@@ -103,18 +107,18 @@ function SalesRecords({ refresh, initialYear }: SalesRecordsProps) {
                                 totalTarget > 0 ? Math.round((totalAmount / totalTarget) * 100) : 0;
 
                                 return (
-                                <View style={styles.recordRow}>
+                                <View style={styles.totalRow}>
                                     <View style={styles.recordItem}>
                                     <Text style={styles.itemText}>합계</Text>
                                     </View>
                                     <View style={styles.recordItem}>
-                                    <Text style={styles.itemText}>{totalTarget.toLocaleString()}</Text>
+                                    <Text style={styles.itemTotalText}>{totalTarget.toLocaleString()}</Text>
                                     </View>
                                     <View style={styles.recordItem}>
-                                    <Text style={styles.itemText}>{totalAmount.toLocaleString()}</Text>
+                                    <Text style={styles.itemTotalText}>{totalAmount.toLocaleString()}</Text>
                                     </View>
                                     <View style={styles.recordItem}>
-                                    <Text style={styles.itemText}>{totalRate}%</Text>
+                                    <Text style={styles.itemTotalText}>{totalRate}%</Text>
                                     </View>
                                 </View>
                                 );
@@ -129,32 +133,42 @@ function SalesRecords({ refresh, initialYear }: SalesRecordsProps) {
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: "#FFF",
+        borderRadius: 8,
         padding: 10,
-        borderWidth: 1,
-        borderColor: "#ccc",
     },
     titleContainer: {
+        padding: 10,
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
+        borderBottomWidth: 1,
+        borderColor: "#eee",
     },
     title: {
-        fontSize: 16,
-        fontWeight: "bold",
-        marginBottom: 12,
+        fontSize: 18,
+        fontWeight: "bold",        
     },
     dateButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderWidth: 1,
+        width: 70,
+        height: 30,
+        borderWidth: 1.5,
         borderColor: "#038CD0",
         borderRadius: 5,
-        marginRight: 10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    dateButtonText: {
+        fontSize: 14,
     },
     recordContainer: {
 
     },
     recordHeader: {
         flexDirection: "row",
+        paddingVertical: 15,
+        borderBottomWidth: 2,
+        borderColor: "#ccc",
     },
     itemHeaderText: {
         fontSize: 14,
@@ -168,20 +182,33 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#ccc",
     },
     itemText: {
         fontSize: 12,
     },
-    emptyText: {
+    messageBox: {
+        height: 200,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    messageText: {
         color: "#999",
-        fontStyle: "italic",
+        fontSize: 20,
     },
     recordRow: {
         flexDirection: "row",
-        height: 40,
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderColor: "#eee",
     },
+    totalRow: {
+        flexDirection: "row",
+        paddingVertical: 15,
+    },
+    itemTotalText: {
+        color: "#038CD0",
+        fontSize: 12,
+    }
 })
 
 export default SalesRecords;

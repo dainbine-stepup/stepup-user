@@ -32,7 +32,7 @@ const MonthSelectorModal = ({ visible, onClose, onSelect }: Props) => {
               )}
             />
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-              <Text>닫기</Text>
+              <Text style={styles.closeBtnText}>닫기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -45,27 +45,46 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.3)",
   },
   modal: {
     backgroundColor: "#fff",
-    marginHorizontal: 40,
     borderRadius: 10,
     padding: 20,
+    width: "80%",
+    maxWidth: 320,
   },
   title: {
     fontSize: 18,
-    marginBottom: 10,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
   },
   item: {
     width: "30%",
-    paddingVertical: 10,
+    paddingVertical: 12,
+    marginVertical: 6,
+    marginHorizontal: 5,
     alignItems: "center",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
   closeBtn: {
-    marginTop: 10,
-    alignSelf: "flex-end",
+    width: "100%",
+    marginTop: 20,
+    paddingVertical: 10,
+    backgroundColor: "#038CD0",
+    alignItems: "center",
+    borderRadius: 6,
+  },
+  closeBtnText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
+
 
 export default MonthSelectorModal;
