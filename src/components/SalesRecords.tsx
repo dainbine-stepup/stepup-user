@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 // DB
-import { getAllSales, findSalesByYear } from "../database/SalesRepository";
+import { findSalesByYear } from "../database/SalesRepository";
 
 // 컴포넌트
 import YearSelectorModal from "./YearSelectorModal";

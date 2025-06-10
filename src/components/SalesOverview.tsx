@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 // DB
-import { getAllSales, findSalesByYear } from "../database/SalesRepository";
+import { findSalesByYear } from "../database/SalesRepository";
 
 interface SalesOverviewProps {
   initialYear: string;

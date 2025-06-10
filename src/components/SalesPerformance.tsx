@@ -1,9 +1,8 @@
-import { months } from "moment";
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 // DB
-import { getAllSales, findSalesByYear } from "../database/SalesRepository";
+import { findSalesByYear } from "../database/SalesRepository";
 
 // 컴포넌트
 import MonthlySalesChart from "./MonthlySalesChart";

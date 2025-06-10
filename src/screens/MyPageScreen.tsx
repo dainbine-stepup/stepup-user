@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -17,6 +17,7 @@ type MyPageStackParamList = {
 function MyPageScreen() {
 
     const navigation = useNavigation<StackNavigationProp<MyPageStackParamList>>();
+    const scrollRef = useRef<ScrollView>(null);
 
     // 변수
     // 현재 년/월 저장
@@ -27,6 +28,10 @@ function MyPageScreen() {
     const [componentKey, setComponentKey] = useState(0);
     useFocusEffect(
         React.useCallback(() => {
+
+            // 스크롤 맨 위로 이동
+            scrollRef.current?.scrollTo({ y: 0, animated: false });
+            
             // 현재 시간 계산
             const now = new Date();
             const currentYear = String(now.getFullYear());
@@ -41,7 +46,7 @@ function MyPageScreen() {
     );
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView ref={scrollRef} style={styles.container}>
             <View style={styles.content}>
                 <Header />
 

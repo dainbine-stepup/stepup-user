@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import {Image, TouchableOpacity, View, Text} from 'react-native';
+import { View, Text } from 'react-native';
 
 // 스크린
 import MainScreen from './src/screens/MainScreen';
@@ -57,12 +57,14 @@ function App(): React.JSX.Element {
                 </Text>
               </View>
             ),
+            popToTopOnBlur: route.name === 'MyPageStack',
           };
         }}
       >
         <Drawer.Screen name="Main" component={MainScreen} options={{title: '메인'}} />
         <Drawer.Screen name="Sales" component={SalesScreen} options={{title: '매출 관리'}} />
-        <Drawer.Screen name="MyPageStack" component={MyPageStack} options={{ title: '마이페이지' }} />
+        <Drawer.Screen name="MyPageStack" component={MyPageStack} options={{ title: '마이페이지' }}
+        />
       </Drawer.Navigator>
     </NavigationContainer>
   );

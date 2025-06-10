@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
@@ -11,6 +11,8 @@ import AdviceBoard from "../components/AdviceBoard";
 
 function MainScreen() {
 
+    const scrollRef = useRef<ScrollView>(null);
+
     // 변수
     // 현재 년/월 저장
     const [year, setYear] = useState("");
@@ -20,6 +22,10 @@ function MainScreen() {
     const [componentKey, setComponentKey] = useState(0);
     useFocusEffect(
         React.useCallback(() => {
+
+            // 스크롤 맨 위로 이동
+            scrollRef.current?.scrollTo({ y: 0, animated: false });
+
             // 현재 시간 계산
             const now = new Date();
             const currentYear = String(now.getFullYear());
@@ -34,7 +40,7 @@ function MainScreen() {
     );
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView ref={scrollRef} style={styles.container}>
             <View style={styles.content}>
                 <Header />
 
