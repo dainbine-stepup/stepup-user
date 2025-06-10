@@ -9,7 +9,7 @@ interface Props {
 
 const YearSelectorModal = ({ visible, onClose, onSelect }: Props) => {
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => String(currentYear - 5 + i));
+  const years = Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i));
 
   return (
     <Modal visible={visible} transparent>

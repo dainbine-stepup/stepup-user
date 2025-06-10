@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
-import { useFocusEffect } from "@react-navigation/native";
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 // 컴포넌트
 import Header from "../components/Header";
@@ -8,7 +9,14 @@ import Footer from "../components/Footer";
 import SalesOverview from '../components/SalesOverview';
 import SalesPerformance from '../components/SalesPerformance';
 
+type MyPageStackParamList = {
+  MyPage: undefined;
+  SalesFromMyPage: undefined;
+};
+
 function MyPageScreen() {
+
+    const navigation = useNavigation<StackNavigationProp<MyPageStackParamList>>();
 
     // 변수
     // 현재 년/월 저장
@@ -49,7 +57,23 @@ function MyPageScreen() {
                     initialMonth={month}
                 />
 
+                <View style={styles.buttonGroup}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => navigation.navigate("SalesFromMyPage")}
+                    >
+                        <Text style={styles.buttonText}>매출 관리</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => Alert.alert('알림', '준비중입니다.')}
+                    >
+                        <Text style={styles.buttonText}>상담 문의</Text>
+                    </TouchableOpacity>
+                </View>
+
                 <Footer />
+
             </View>
         </ScrollView>
     )
@@ -63,6 +87,24 @@ const styles = StyleSheet.create({
     content: {
         gap: 20,
         flexDirection: "column",
+    },
+    buttonGroup: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        padding: 20,
+    },
+    button: {
+        width: "45%",
+        height: 40,
+        backgroundColor: "#038CD0",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    buttonText: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#FFF",
     },
 })
 

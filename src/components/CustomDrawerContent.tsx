@@ -8,11 +8,7 @@ function CustomDrawerContent(props: any) {
 
             {/* 헤더 */}
             <View style={styles.header}>
-                <Image
-                source={require('../../android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png')} // 경로 확인
-                style={styles.logo}
-                />
-                <Text style={styles.appName}>StepUp</Text>
+                <Text style={styles.appName}>Test App</Text>
             </View>
 
             {/* 메뉴 리스트 */}
