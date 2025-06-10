@@ -95,27 +95,31 @@ function SalesGoalSetter({ onSave, reset, initialYear, initialMonth }: SalesGoal
     return (
         <View style={styles.container}>
             <View style={styles.titleContainer}>
-                <Text style={styles.title}>매출설정</Text>
+                <Text style={styles.title}>매출 설정</Text>
             </View>
             <View style={styles.setterContainer}>
 
                 {/* 년/월 입력창 */}
-                <View style={styles.row}>
-                    <TouchableOpacity
-                        style={styles.dateButton}
-                        onPress={() => setYearModalVisible(true)}
-                    >
-                        <Text>{year}</Text>
-                    </TouchableOpacity>
-                    <Text>년</Text>
-
-                    <TouchableOpacity
-                        style={styles.dateButton}
-                        onPress={() => setMonthModalVisible(true)}
-                    >    
-                        <Text>{month}</Text>
-                    </TouchableOpacity>
-                    <Text>월</Text>
+                <View style={styles.dateRow}>
+                    <View style={styles.dateButtonContainer}>
+                        <TouchableOpacity
+                            style={styles.dateButton}
+                            onPress={() => setYearModalVisible(true)}
+                        >
+                            <Text style={styles.dateButtonText}>{year}</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.setterText}>년</Text>
+                    </View>
+                    
+                    <View style={styles.dateButtonContainer}>
+                        <TouchableOpacity
+                            style={styles.dateButton}
+                            onPress={() => setMonthModalVisible(true)}
+                        >    
+                            <Text>{month}</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.setterText}>월</Text>
+                    </View>
                 </View>
 
                 {/* year modal */}
@@ -139,31 +143,41 @@ function SalesGoalSetter({ onSave, reset, initialYear, initialMonth }: SalesGoal
                 />
 
                 {/* 목표 금액 입력창 */}
-                <View style={styles.row}>
-                    <Text>목표 금액</Text>
-                    <TextInput
-                        value={goal}
-                        onChangeText={setGoal}
-                        keyboardType="numeric"
-                        style={styles.input}
-                    />
-                    <Text>원</Text>
+                <View style={styles.inputRow}>
+                    <View style={styles.inputTitle}>
+                        <Text style={styles.setterText}>목표 금액</Text>
+                    </View>
+                    <View style={styles.inputBox}>
+                        <TextInput
+                            value={goal}
+                            onChangeText={setGoal}
+                            keyboardType="numeric"
+                            style={styles.input}
+                        />
+                        <Text style={styles.setterText}>원</Text>
+                    </View>
                 </View>
 
                 {/* 달성 금액 입력창 */}
-                <View style={styles.row}>
-                    <Text>달성 금액</Text>
-                    <TextInput
-                        value={amount}
-                        onChangeText={setAmount}
-                        keyboardType="numeric"
-                        style={styles.input}
-                    />
-                    <Text>원</Text>
+                <View style={styles.inputRow}>
+                    <View style={styles.inputTitle}>
+                        <Text style={styles.setterText}>달성 금액</Text>
+                    </View>                    
+                    <View style={styles.inputBox}>
+                        <TextInput
+                            value={amount}
+                            onChangeText={setAmount}
+                            keyboardType="numeric"
+                            style={styles.input}
+                        />
+                        <Text style={styles.setterText}>원</Text>
+                    </View>
                 </View>
                 
                 {/* 적용하기 버튼 */}
-                <Button title="적용하기" onPress={applyHandler} />
+                <TouchableOpacity style={styles.applyButton} onPress={applyHandler}>
+                    <Text style={styles.applyButtonText}>적용하기</Text>
+                </TouchableOpacity>
             </View>
         </View>
     )
@@ -171,39 +185,87 @@ function SalesGoalSetter({ onSave, reset, initialYear, initialMonth }: SalesGoal
 
 const styles = StyleSheet.create({
     container: {
-        borderWidth: 1,
-        borderColor: '#ccc',
+        backgroundColor: "#FFF",
+        borderRadius: 8,
     },
     titleContainer: {
-        padding: 10,
+        padding: 20,
+        borderBottomWidth: 1,
+        borderColor: "#eee",
     },
     title: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "bold",
     },
     setterContainer: {
-        padding: 10,
+        padding: 20,
     },
-    row: {
+    dateRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingHorizontal: 30,
+    },
+    dateButtonContainer: {
         flexDirection: "row",
         gap: 5,
-        marginBottom: 10,
+        alignItems: "center",
     },
     dateButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderWidth: 1,
+        width: 100,
+        height: 35,
+        borderWidth: 1.5,
         borderColor: "#038CD0",
         borderRadius: 5,
-        marginRight: 10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    dateButtonText: {
+        fontSize: 16,
+    },
+    setterText: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#008BF1",
+    },
+    inputRow: {
+        paddingHorizontal: 10,
+        marginTop: 20,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        
+    },
+    inputTitle: {
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 0.3,
+    },
+    inputBox: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        gap: 10,
+        flex: 0.7,
     },
     input: {
-        width: "50%",
+        width: "70%",
         borderWidth: 1,
-        borderColor: "#ccc",
-        padding: 8,
-        borderRadius: 5,
-        marginBottom: 10,
+        borderColor: "#038CD0",
+        borderRadius: 8,
+        paddingHorizontal: 8,
+    },
+    applyButton: {
+        marginTop: 20,
+        marginHorizontal: 10,
+        height: 40,
+        backgroundColor: "#038CD0",
+        borderRadius: 8,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    applyButtonText: {
+        color: "#FFF",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 })
 

@@ -13,8 +13,10 @@ function SalesScreen() {
     // 현재 년/월 저장
     const [year, setYear] = useState("");
     const [month, setMonth] = useState("");
+
     // 매출 현황 새로고침
     const [refreshFlag, setRefreshFlag] = useState(false); 
+    
     // 매출 설정 리셋(입력창 비우기)
     const [resetFlag, setResetFlag] = useState(false);
 
@@ -78,7 +80,7 @@ const styles = StyleSheet.create({
         padding: 10,
         gap: 20,
         flexDirection: "column",
-    }
+    },
 })
 
 export default SalesScreen;

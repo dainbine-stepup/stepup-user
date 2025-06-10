@@ -16,9 +16,7 @@ function Footer() {
 
 const styles = StyleSheet.create({
   footer: {
-    borderWidth: 1,
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingVertical: 50,
     justifyContent: "center",
     alignItems: "center",
   },

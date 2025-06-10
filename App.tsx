@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
+import { createStackNavigator } from '@react-navigation/stack';
 import {Image, TouchableOpacity, View, Text} from 'react-native';
 
 // 스크린
 import MainScreen from './src/screens/MainScreen';
 import SalesScreen from './src/screens/SalesScreen';
-import AdviceScreen from './src/screens/AdviceScreen';
 import MyPageScreen from './src/screens/MyPageScreen';
 
 // 컴포넌트
@@ -15,7 +15,19 @@ import CustomDrawerContent from './src/components/CustomDrawerContent'; // 드�
 // 데이터베이스
 import { initDatabase } from './src/database/initDatabase';
 
+// 네비게이터 생성
 const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
+
+// 마이페이지 스택 네비게이터
+function MyPageStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none', }}>
+      <Stack.Screen name="MyPage" component={MyPageScreen} />
+      <Stack.Screen name="SalesFromMyPage" component={SalesScreen} />
+    </Stack.Navigator>
+  );
+}
 
 // App
 function App(): React.JSX.Element {
@@ -31,20 +43,15 @@ function App(): React.JSX.Element {
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={({route}) => {
           const titles: {[key: string]: string} = {
-            Main: 'StepUp',
+            Main: '메인',
             Sales: '매출 관리',
-            Advice: '맞춤 상담',
-            MyPage: '마이페이지',
+            MyPageStack: '마이페이지',
           };
 
           return {
             drawerPosition: 'right', // 햄버거 버튼 오른쪽 이동
             headerTitle: () => (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Image
-                  source={require('./android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png')}
-                  style={{width: 40, height: 40, marginRight: 10}}
-                />
+              <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 10}}>
                 <Text style={{fontSize: 18, fontWeight: 'bold'}}>
                   {titles[route.name] || route.name}
                 </Text>
@@ -55,8 +62,7 @@ function App(): React.JSX.Element {
       >
         <Drawer.Screen name="Main" component={MainScreen} options={{title: '메인'}} />
         <Drawer.Screen name="Sales" component={SalesScreen} options={{title: '매출 관리'}} />
-        {/* <Drawer.Screen name="Advice" component={AdviceScreen} options={{title: '맞춤 상담'}} /> */}
-        <Drawer.Screen name="MyPage" component={MyPageScreen} options={{title: '마이페이지'}} />
+        <Drawer.Screen name="MyPageStack" component={MyPageStack} options={{ title: '마이페이지' }} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
