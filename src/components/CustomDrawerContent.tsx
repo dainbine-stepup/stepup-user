@@ -7,7 +7,7 @@ import {
   DrawerContentComponentProps,
   DrawerNavigationProp,
 } from '@react-navigation/drawer';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 type DrawerParamList = {
   Main: undefined;
@@ -15,33 +15,37 @@ type DrawerParamList = {
   MyPageStack: undefined;
 };
 
-const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
-
+const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation<DrawerNavigationProp<DrawerParamList>>();
 
   return (
     <DrawerContentScrollView {...props}>
-
       {/* 헤더 */}
       <View style={styles.header}>
-          <Text style={styles.appName}>Test App</Text>
+        <Text style={styles.appName}>Step Up</Text>
       </View>
 
       {/* 메인 */}
       <DrawerItem
-        label="메인"
+        label="매출 현황"
         onPress={() => {
           props.navigation.navigate('Main');
         }}
         labelStyle={{
           fontWeight:
-            props.state.routeNames[props.state.index] === 'Main' ? 'bold' : 'normal',
+            props.state.routeNames[props.state.index] === 'Main'
+              ? 'bold'
+              : 'normal',
           color:
-            props.state.routeNames[props.state.index] === 'Main' ? '#2196F3' : '#000',
+            props.state.routeNames[props.state.index] === 'Main'
+              ? '#2196F3'
+              : '#000',
         }}
         style={{
           backgroundColor:
-            props.state.routeNames[props.state.index] === 'Main' ? '#e3f2fd' : 'transparent',
+            props.state.routeNames[props.state.index] === 'Main'
+              ? '#e3f2fd'
+              : 'transparent',
         }}
       />
 
@@ -53,13 +57,19 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
         }}
         labelStyle={{
           fontWeight:
-            props.state.routeNames[props.state.index] === 'Sales' ? 'bold' : 'normal',
+            props.state.routeNames[props.state.index] === 'Sales'
+              ? 'bold'
+              : 'normal',
           color:
-            props.state.routeNames[props.state.index] === 'Sales' ? '#2196F3' : '#000',
+            props.state.routeNames[props.state.index] === 'Sales'
+              ? '#2196F3'
+              : '#000',
         }}
         style={{
           backgroundColor:
-            props.state.routeNames[props.state.index] === 'Sales' ? '#e3f2fd' : 'transparent',
+            props.state.routeNames[props.state.index] === 'Sales'
+              ? '#e3f2fd'
+              : 'transparent',
         }}
       />
 
@@ -70,24 +80,30 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{ name: 'MyPageStack' }],
-            })
+              routes: [{name: 'MyPageStack'}],
+            }),
           );
         }}
         labelStyle={{
           fontWeight:
-            props.state.routeNames[props.state.index] === 'MyPageStack' ? 'bold' : 'normal',
+            props.state.routeNames[props.state.index] === 'MyPageStack'
+              ? 'bold'
+              : 'normal',
           color:
-            props.state.routeNames[props.state.index] === 'MyPageStack' ? '#2196F3' : '#000',
+            props.state.routeNames[props.state.index] === 'MyPageStack'
+              ? '#2196F3'
+              : '#000',
         }}
         style={{
           backgroundColor:
-            props.state.routeNames[props.state.index] === 'MyPageStack' ? '#e3f2fd' : 'transparent',
+            props.state.routeNames[props.state.index] === 'MyPageStack'
+              ? '#e3f2fd'
+              : 'transparent',
         }}
       />
     </DrawerContentScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   header: {
