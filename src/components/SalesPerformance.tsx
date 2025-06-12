@@ -8,8 +8,8 @@ import { findSalesByYear } from "../database/SalesRepository";
 import MonthlySalesChart from "./MonthlySalesChart";
 
 interface SalesPerformanceProps {
-    initialYear: string;
-    initialMonth: string;
+    year: string;
+    month: string;
 }
 
 interface SalesRecord {
@@ -19,11 +19,7 @@ interface SalesRecord {
   rate: number;
 }
 
-function SalesPerformance({ initialYear, initialMonth }: SalesPerformanceProps) {
-
-    // 년/월 저장(검색용)
-    const [year, setYear] = useState(initialYear);
-    const [month, setMonth] = useState(initialMonth);
+function SalesPerformance({ year, month }: SalesPerformanceProps) {
 
     const [yearData, setYearData] = useState<SalesRecord[]>([]);
 

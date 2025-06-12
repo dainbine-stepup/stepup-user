@@ -100,3 +100,18 @@ export const updateSales = (date, target, amount) => {
     });
   });
 };
+
+// 데이터 삭제
+export const deleteSales = (date) => {
+  console.log('ㅎㅇㅎㅇㅎㅇ')
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `DELETE FROM tb_sales WHERE date = ?`,
+        [date],
+        (tx, results) => resolve(results),
+        error => reject(error)
+      );
+    });
+  });
+};

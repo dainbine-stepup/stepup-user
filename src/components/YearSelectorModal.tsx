@@ -15,27 +15,25 @@ const YearSelectorModal = ({ visible, onClose, onSelect }: Props) => {
     <Modal visible={visible} transparent>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={styles.modal}>
-              <Text style={styles.title}>연도 선택</Text>
-              <FlatList
-                style={styles.listContainer}
-                data={years}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.item}
-                    onPress={() => onSelect(item)}
-                  >
-                    <Text>{item}년</Text>
-                  </TouchableOpacity>
-                )}
-              />
-              <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-                <Text style={styles.closeBtnText}>닫기</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableWithoutFeedback>
+          <View style={styles.modal}>
+            <Text style={styles.title}>연도 선택</Text>
+            <FlatList
+              style={styles.listContainer}
+              data={years}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => onSelect(item)}
+                >
+                  <Text>{item}년</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+              <Text style={styles.closeBtnText}>닫기</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -52,13 +50,9 @@ const styles = StyleSheet.create({
   modal: {
     width: "80%",
     backgroundColor: "#fff",
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 20,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    maxWidth: 320,
   },
   title: {
     fontSize: 18,

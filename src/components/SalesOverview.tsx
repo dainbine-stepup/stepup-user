@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 // DB
 import { findSalesByYear } from "../database/SalesRepository";
 
 interface SalesOverviewProps {
-  initialYear: string;
-  initialMonth: string;
+  year: string;
+  month: string;
+  onDataLoaded: (data: any) => void;
 };
 
 interface SalesRecord {
@@ -16,38 +17,47 @@ interface SalesRecord {
   rate: number;
 }
 
-function SalesOverview({ initialYear, initialMonth }: SalesOverviewProps) {
+function SalesOverview({ year, month, onDataLoaded }: SalesOverviewProps) {
 
-  // 년/월 저장(검색용)
-  const [year, setYear] = useState(initialYear);
-  const [month, setMonth] = useState(initialMonth);
 
   // 매출 데이터
   const [yearData, setYearData] = useState<SalesRecord[]>([]);
 
   useEffect(() => {
     findSalesByYear(year)
-      .then((data) => {
+      .then((data: SalesRecord[]) => {
         setYearData(data);
+        const overview = calculateOverviewData(data, year, month);
+        onDataLoaded(overview);
       })
       .catch((error) => {
-        console.error("연도별 매출 조회 실패", error);
+        console.error("매출 조회 실패", error);
       });
-  }, [year])
+  }, [year, month])
 
-  const totalYearAmount = yearData.reduce((sum, item) => sum + item.amount, 0);
-  const totalYearTarget = yearData.reduce((sum, item) => sum + item.target, 0);
+  const { totalYearAmount, totalYearTarget, monthAmount, monthTarget } = useMemo(() => {
+    return calculateOverviewData(yearData, year, month);
+  }, [yearData, year, month]);
 
-  const monthKey = `${year}-${month.padStart(2, '0')}`;
-  const monthData = yearData.find(item => item.date === monthKey);
-  const monthAmount = monthData?.amount || 0;
-  const monthTarget = monthData?.target || 0;
+  function calculateOverviewData(data: SalesRecord[], year: string, month: string) {
+    const totalYearAmount = data.reduce((sum, item) => sum + item.amount, 0);
+    const totalYearTarget = data.reduce((sum, item) => sum + item.target, 0);
+
+    const monthKey = `${year}-${month.padStart(2, '0')}`;
+    const monthData = data.find(item => item.date === monthKey);
+    const monthAmount = monthData?.amount || 0;
+    const monthTarget = monthData?.target || 0;
+
+    return {
+      totalYearAmount,
+      totalYearTarget,
+      monthAmount,
+      monthTarget,
+    };
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>매출현황</Text>
-      </View>
       <View style={styles.row}>
         <View style={styles.item}>
           <View style={styles.itemTitle}>
@@ -96,14 +106,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
     gap: 10,
-  },
-  titleContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 5,
-  },
-  titleText: {
-    fontSize: 18,
-    fontWeight: "bold",
   },
   row: {
     flexDirection: "row",

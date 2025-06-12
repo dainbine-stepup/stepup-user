@@ -25,7 +25,7 @@ function Header() {
       end={{x: 1, y: 0}}
       style={styles.header}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>브랜드 위즈</Text>
+        <Text style={styles.title}>Step Up</Text>
       </View>
       <View style={styles.dateContainer}>
         <Text style={styles.dateTitleText}>가입일</Text>

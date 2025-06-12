@@ -17,17 +17,6 @@ import {initDatabase} from './src/database/initDatabase';
 
 // 네비게이터 생성
 const Drawer = createDrawerNavigator();
-const Stack = createStackNavigator();
-
-// 마이페이지 스택 네비게이터
-function MyPageStack() {
-  return (
-    <Stack.Navigator screenOptions={{headerShown: false, animation: 'none'}}>
-      <Stack.Screen name="MyPage" component={MyPageScreen} />
-      <Stack.Screen name="SalesFromMyPage" component={SalesScreen} />
-    </Stack.Navigator>
-  );
-}
 
 // App
 function App(): React.JSX.Element {
@@ -45,7 +34,6 @@ function App(): React.JSX.Element {
           const titles: {[key: string]: string} = {
             Main: '매출 현황',
             Sales: '매출 관리',
-            MyPageStack: '마이페이지',
           };
 
           return {
@@ -62,7 +50,6 @@ function App(): React.JSX.Element {
                 </Text>
               </View>
             ),
-            popToTopOnBlur: route.name === 'MyPageStack',
           };
         }}>
         <Drawer.Screen
@@ -74,11 +61,6 @@ function App(): React.JSX.Element {
           name="Sales"
           component={SalesScreen}
           options={{title: '매출 관리'}}
-        />
-        <Drawer.Screen
-          name="MyPageStack"
-          component={MyPageStack}
-          options={{title: '마이페이지'}}
         />
       </Drawer.Navigator>
     </NavigationContainer>
